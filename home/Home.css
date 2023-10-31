@@ -1,0 +1,82 @@
+body{
+    background-image: url(../images/elipses.png);
+    background-size: 100%;
+}
+
+.container{
+    background-image: url(../images/logo.png);
+    height: 80vh;
+    background-size: 80%;
+    position:absolute;
+    left: 0cqmax;
+}
+
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+
+.button1 {
+    display: inline-block;
+    margin-left: 300px;
+    margin-top: 300px;
+    padding: 100px 25px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px black;
+}
+
+.button2 {
+    display: inline-block;
+    margin-left: 200px;
+    padding: 100px 25px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px black;
+}
+
+.button3 {
+    display: inline-block;
+    margin-left: 200px;
+    padding: 100px 25px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px black;
+}
+  
+.button1:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.button2:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.button3:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
