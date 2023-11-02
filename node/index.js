@@ -34,7 +34,7 @@ function Cartoes (bd){
     this.criarCartao = async function (cartao){
         const conexao = await this.bd.getConexao();
 
-        const sqlInsert = "INSERT INTO Cartoes (Numero, CreatedDate)" + 
+        const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE)" + 
                         "VALUES (:0, sysdate)";
         const dados = [cartao.numCartao];
         console.log(sqlInsert, dados);
@@ -47,7 +47,7 @@ function Cartoes (bd){
     this.getAllCartoes = async function (){
         const conexao = await this.bd.geConexao();
 
-        const sqlSelect = "SELECT Numero, TO_CHAR(CreatedDate, 'YYYY-MM-DD HH24:MI:SS') FROM Cartoes";
+        const sqlSelect = "SELECT * FROM Cartoes";
 
         ret = await conexao.execute(sqlSelect);
 
@@ -57,8 +57,8 @@ function Cartoes (bd){
     this.getOneCartaoByNum = async function (numero){
         const conexao = await this.bd.getConexao();
 
-        const sqlSelectOne = "SELECT Numero,TO_CHAR(CreatedDate, 'YYYY-MM-DD HH24:MI:SS')" + 
-                                "FROM Cartoes WHERE Numero = :0";
+        const sqlSelectOne = "SELECT NUM_CARTAO,TO_CHAR(CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')" + 
+                                "FROM Cartoes WHERE NUM_CARTAO = :0";
         
         const dados = [numero];
         ret = await conexao.execute(sqlSelectOne, dados);
@@ -119,18 +119,16 @@ async function getAllCartoes(req, res){
     catch(exception)
     {}
 
-    if(get.length==0)
-    {
-        return res.status(200).json([]);
-    }
-    else
-    {
+    //if(get.length()==0)
+    //{
+    //    return res.status(200).json([]);
+    //}
+   
         const ret = [];
         for(i=0;i<get.length;i++)
             ret.push(new Cartao(get[i][0], get[i][1]));
 
         return res.status(200).json(ret);
-    }
 }
 
 async function getOneCartaoByNum(req, res){
