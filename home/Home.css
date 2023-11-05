@@ -1,7 +1,22 @@
 body{
     background-image: url(../images/elipses.png);
     background-size: 100%;
+    border: none;
+    overflow: hidden;
+   
+    padding: 0; /* Remova preenchimento padrão do corpo */
+
 }
+
+.logo {
+    
+    position: absolute;
+    margin-top: 50px;
+    left: 750px; /* Centralize a imagem horizontalmente */
+    transform: translateX(-50%); /* Centralize a imagem horizontalmente */
+    max-width: 30%; /* Garanta que a imagem não ultrapasse a largura do corpo */
+}
+
 
 
 .wrapper {
@@ -13,7 +28,7 @@ body{
 .button1 {
     
     display: inline-block;
-    margin-left: 200px;
+    margin-left: 230px;
     margin-top: 300px;
     padding: 100px 60px;
     font-size: 24px;
