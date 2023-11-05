@@ -1,27 +1,25 @@
 
 function BD(){
-    process.env.ORA_SDTZ = 'UTC-3';
+    //process.env.ORA_SDTZ = 'UTC-3';
 
     this.getConexao = async function (){
         if (global.conexao)
             return global.conexao;
 
         const oracledb = require('oracledb');
-        const dbConfig = require('./dbconfig.js');
 
         try 
         {
-            global.conexao = await oracledb.getConnection(dbConfig);
+            global.conexao = await oracledb.getConnection({user: 'system', password: 'pioracle', connectString: 'localhost/xe', timezone: 'UTC-3'});
         }
-        catch (exception){
-            console.log('Não foi possível conectar ao BD');
+        catch (err){
+            console.error(err);
             process.exit(1);
         }
 
         return global.conexao;
     }
 }
-
 
 function Cartao (numCartao, createdDate){
     this.numCartao = numCartao;
@@ -35,17 +33,16 @@ function Cartoes (bd){
         const conexao = await this.bd.getConexao();
 
         const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE)" + 
-                        "VALUES (:0, sysdate)";
-        const dados = [cartao.numCartao];
+                        "VALUES (:numCartao, sysdate)";
+        const dados = {numCartao: cartao.numCartao};
         console.log(sqlInsert, dados);
-        await conexao.execute(sql1, dados);
+        const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
-        const sqlCommit = 'COMMIT';
-        await conexao.execute(sqlCommit);
+        console.log(result);
     }
 
     this.getAllCartoes = async function (){
-        const conexao = await this.bd.geConexao();
+        const conexao = await this.bd.getConexao();
 
         const sqlSelect = "SELECT * FROM Cartoes";
 
@@ -58,11 +55,11 @@ function Cartoes (bd){
         const conexao = await this.bd.getConexao();
 
         const sqlSelectOne = "SELECT NUM_CARTAO,TO_CHAR(CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')" + 
-                                "FROM Cartoes WHERE NUM_CARTAO = :0";
+                                "FROM Cartoes WHERE NUM_CARTAO = :numCartao";
         
-        const dados = [numero];
+        const dados = {numCartao: numero};
         ret = await conexao.execute(sqlSelectOne, dados);
-
+        
         return ret.rows;
     }
 } 
@@ -74,6 +71,45 @@ function Servico (codigo, nome, descricao, numCartao){
     this.numCartao = numCartao;
 }
 
+function Servicos(bd){
+    this.bd = bd;
+
+    this.criarServico = async function (servico){
+        const conexao = await this.bd.getConexao();
+        
+        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO)" + 
+                        "VALUES (:codServico, :nome, :descricao)";
+        const dados = {codServico: servico.codigo, nome: servico.nome, descricao: servico.descricao};
+        console.log(sqlInsert, dados);
+        const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
+        
+        console.log(result);
+    }
+    
+    this.getAllServicos = async function (){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectAll = "SELECT * FROM SERVICOS";
+        
+        ret = await conexao.execute(sqlSelectAll);
+
+        return ret.rows;
+    }
+
+    this.compraServico = async function(codServico, numCartao){
+        const conexao = await this.bd.getConexao();
+
+        const sqlInsert = "UPDATE SERVICOS " +
+                            "SET NUM_CARTAO = :numCartao " + 
+                            "WHERE COD_SERVICO = :codServico";
+
+        const dados = {numCartao: numCartao, codServico: codServico};
+        console.log(sqlInsert, dados);
+        const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
+
+        console.log(result);
+    }
+}
 
 function middleWareGlobal(req, res, next)
 {
@@ -88,20 +124,20 @@ function middleWareGlobal(req, res, next)
 }
 
 async function criarCartao(req, res){
-    if(req.body.numCartao || req.body.createdDate){
+    if(req.params.numCartao){
         return res.status(422).json();
     }
 
-    const numCartao = req.params.numCartao;
+    const numCartao = req.body.numCartao;
     
-    const cartao = new Cartao(numCartao, LocalDateTime.now());
+    const cartao = new Cartao(numCartao, req.body.createdDate);
 
     try{
         await global.cartoes.criarCartao(cartao);
-        return res.status(201).json();
+        return res.status(201).json(numCartao);
     }
     catch(exception){
-        console.log('Cartão já existente com o número '+ numCartao);
+        console.log(exception);
         return res.status(409).json();
     }
 }
@@ -119,16 +155,17 @@ async function getAllCartoes(req, res){
     catch(exception)
     {}
 
-    //if(get.length()==0)
-    //{
-    //    return res.status(200).json([]);
-    //}
-   
+    if(typeof get === 'undefined')
+    {
+        return res.status(404).json([]);
+    }
+    else{
         const ret = [];
         for(i=0;i<get.length;i++)
             ret.push(new Cartao(get[i][0], get[i][1]));
 
         return res.status(200).json(ret);
+    }
 }
 
 async function getOneCartaoByNum(req, res){
@@ -154,11 +191,72 @@ async function getOneCartaoByNum(req, res){
     }
 }
 
+async function criarServico(req, res){
+    if(req.params.codServico){
+        return res.status(422).json();
+    }
 
+    const codServico = req.body.codServico;
+    const nome = req.body.nome;
+    const desc = req.body.descricao;
+
+    const servico = new Servico(codServico, nome, desc);
+
+    try{
+        await global.servicos.criarServico(servico);
+        return res.status(201).json(codServico);
+    }
+    catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }
+}
+
+async function getAllServicos(req, res){
+    let get; 
+
+    try
+    {
+        get = await global.servicos.getAllServicos();
+    }
+    catch(exception)
+    {}
+
+    if(typeof get === 'undefined')
+    {
+        return res.status(404).json([]);
+    }
+    else{
+        const ret = [];
+        for(i=0;i<get.length;i++)
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3]));
+
+        console.log(ret);
+        return res.status(200).json(ret);
+    }
+}
+
+async function compraServico(req, res){
+    if(req.body.codServico || req.body.numCartao)
+        return res.status(422).json();
+    
+    const codServico = req.params.codServico;
+    const numCartao = req.params.numCartao; 
+
+    try{
+        await global.servicos.compraServico(codServico, numCartao);
+        return res.status(201).json({"codServico": codServico, "numCartao": numCartao});
+    }
+    catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }
+}
 async function ligarServidor()
 {
     const bd = new BD();
     global.cartoes = new Cartoes (bd);
+    global.servicos = new Servicos(bd);
 
     const express = require('express');
 
@@ -167,12 +265,13 @@ async function ligarServidor()
     app.use(express.json());
     app.use(middleWareGlobal);
 
-    app.post('/cartoes/:numCartao', criarCartao);
+    app.post('/cartoes', criarCartao);
     app.get('/cartoes', getAllCartoes);
     app.get('/cartoes/:numCartao', getOneCartaoByNum);
 
-    //app.post('/servicos', criarServico);
-    //app.get('/servicos', getAllServicos);
+    app.post('/servicos', criarServico);
+    app.get('/servicos', getAllServicos);
+    app.post('/servicos/:codServico/:numCartao', compraServico);
     //app.get('/servicos/:codigo', getOneServiceByCode)
     //app.get('/servicos/cartoes/:numCartoes', getAllServicesByNumCard);
     
