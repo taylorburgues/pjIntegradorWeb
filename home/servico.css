@@ -1,0 +1,32 @@
+body{
+    background-image: url(../images/elipses.png);
+    background-size: 100%;
+}
+
+.font2{
+    font-size: 50px;
+    position: absolute; 
+	left: 480px;
+	top: 150px;
+}
+
+.btnvoltar{
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 20px;
+    padding: 10px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 40px;
+}
+
+.btnvoltar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}

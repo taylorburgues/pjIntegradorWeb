@@ -3,19 +3,11 @@ body{
     background-size: 100%;
 }
 
-
-.wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 10px;
-  }
-
-.button1 {
-    
+.btnvoltar{
     display: inline-block;
-    margin-left: 200px;
-    margin-top: 300px;
-    padding: 100px 60px;
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
     text-align: center;
@@ -24,14 +16,26 @@ body{
     color: #fff;
     background-color: #707070;
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px #595959;
+    border-radius: 40px;
 }
 
-.button2 {
+.btnvoltar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.font{
+    font-size: 50px;
+    position: absolute; 
+	left: 500px;
+	top: 240px;
+}
+
+.btngerar{
     display: inline-block;
-    margin-left: 200px;
-    padding: 100px 70px;
+    margin-left: 660px;
+	margin-top: 340px;
+    padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
     text-align: center;
@@ -40,14 +44,19 @@ body{
     color: #fff;
     background-color: #707070;
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px #595959;
+    border-radius: 40px;
 }
 
-.button3 {
+.btngerar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.btnvoltar2{
     display: inline-block;
-    margin-left: 200px;
-    padding: 115px 30px;
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
     text-align: center;
@@ -56,21 +65,18 @@ body{
     color: #fff;
     background-color: #707070;
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px #595959;
+    border-radius: 40px;
 }
-  
-.button1:hover {
+
+.btnvoltar2:hover {
     color: #bebebe;
     background-color: #d4d4d4
 }
 
-.button2:hover {
-    color: #bebebe;
-    background-color: #d4d4d4
+.font2{
+    font-size: 50px;
+    position: absolute; 
+	left: 430px;
+	top: 200px;
 }
 
-.button3:hover {
-    color: #bebebe;
-    background-color: #d4d4d4
-}
