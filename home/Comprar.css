@@ -14,6 +14,11 @@ body{
     margin: 0;
 }
 
+@font-face {
+    font-family: Gotham;
+    src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
+}
+
 .button-container {
     display: flex;
     margin-top: 120px;
@@ -28,6 +33,7 @@ body{
 }
 
 .button {
+    font-family: Gotham;
     padding: 10px 35px; 
     margin: 10px; 
     cursor: pointer;
@@ -46,6 +52,7 @@ body{
 }
 
 .btnvoltar{
+    font-family: Gotham;
     display: inline-block;
     margin-left: 10px;
     margin-top: 20px;
@@ -67,6 +74,7 @@ body{
 }
 
 .font2{
+    font-family: Gotham;
     font-size: 50px;
     position: absolute; 
 	left: 480px;

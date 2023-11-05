@@ -3,7 +3,13 @@ body{
     background-size: 100%;
 }
 
+@font-face {
+    font-family: Gotham;
+    src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
+}
+
 .btnvoltar{
+    font-family: Gotham;
     display: inline-block;
     margin-left: 20px;
     margin-top: 20px;
@@ -25,6 +31,7 @@ body{
 }
 
 .font{
+    font-family: Gotham;
     font-size: 50px;
     position: absolute; 
 	left: 500px;
@@ -32,6 +39,7 @@ body{
 }
 
 .btngerar{
+    font-family: Gotham;
     display: inline-block;
     margin-left: 660px;
 	margin-top: 340px;
@@ -53,6 +61,7 @@ body{
 }
 
 .btnvoltar2{
+    font-family: Gotham;
     display: inline-block;
     margin-left: 20px;
     margin-top: 20px;
@@ -74,6 +83,7 @@ body{
 }
 
 .font2{
+    font-family: Gotham;
     font-size: 50px;
     position: absolute; 
 	left: 430px;

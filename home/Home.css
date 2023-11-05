@@ -18,15 +18,19 @@ body{
 }
 
 
-
 .wrapper {
     display: flex;
     flex-wrap: wrap;
     padding: 10px;
   }
 
+@font-face {
+    font-family: Gotham;
+    src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
+}
+  
 .button1 {
-    
+    font-family: Gotham;
     display: inline-block;
     margin-left: 230px;
     margin-top: 300px;
@@ -44,6 +48,7 @@ body{
 }
 
 .button2 {
+    font-family: Gotham;
     display: inline-block;
     margin-left: 200px;
     padding: 100px 70px;
@@ -60,6 +65,7 @@ body{
 }
 
 .button3 {
+    font-family: Gotham;
     display: inline-block;
     margin-left: 200px;
     padding: 115px 30px;
