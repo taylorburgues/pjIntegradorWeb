@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="geracao.css">
     <title>Document</title>
 </head>
-<body>
+<body onload="showCardNumber();">
 
     <div>
         <a class="btnvoltar2" href="Home.html"> Voltar </a>
@@ -14,7 +14,33 @@
 
     <div>
         <a class="font2">SEU NÚMERO DE CARTÃO É:</a>
+        <a id="numCartao"></a>  
     </div>
-    
+    <script src="https://randojs.com/1.0.0.js"></script>
+    <script>
+        const numCartao = rando(0,10000);
+
+        async function showCardNumber(){
+            document.getElementById("numCartao").textContent = numCartao;
+        }
+
+        async function createCard(){
+            const body = {numCartao: numCartao, createdDate: Date().toString};
+
+            console.log(body);
+            const response = await fetch("http://localhost:3000/cartoes", {
+                method: "POST", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            localStorage.setItem("numCartao", numCartao);
+            const result = await response.json();
+            console.log(result);
+        }
+        createCard();
+    </script>
 </body>
 </html>

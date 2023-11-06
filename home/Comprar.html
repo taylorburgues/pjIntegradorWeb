@@ -17,23 +17,29 @@
     <div class="body">
         <div class="button-container">
             <div class="button-column">
-                <a class="button" href="servico.html"> serviço 1 </a>
-                <a class="button" href="servico.html"> serviço 2 </a>
-                <a class="button" href="servico.html"> serviço 3 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(1)"> Serviço 1 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(2)"> Serviço 2 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(3)"> Serviço 3 </a>
             </div>
             <div class="button-column">
-                <a class="button" href="servico.html"> serviço 4 </a>
-                <a class="button" href="servico.html"> serviço 5 </a>
-                <a class="button" href="servico.html"> serviço 6 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(4)"> Serviço 4 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(5)"> Serviço 5 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(6)"> Serviço 6 </a>
             </div>
             <div class="button-column">
-                <a class="button" href="servico.html"> serviço 7 </a>
-                <a class="button" href="servico.html"> serviço 8 </a>
-                <a class="button" href="servico.html"> serviço 9 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(7)"> Serviço 7 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(8)"> Serviço 8 </a>
+                <a class="button" href="servico.html" onclick="loadLocalStorage(9)"> Serviço 9 </a>
             </div>
         </div>
     </div>
 
+    <script>
+        function loadLocalStorage(codServico){
+            localStorage.clear();
+            localStorage.setItem("codServico", codServico);
+        }
+    </script>
     
 </body>
 </html>

@@ -1,4 +1,5 @@
 
+
 function BD(){
     //process.env.ORA_SDTZ = 'UTC-3';
 
@@ -51,21 +52,21 @@ function Cartoes (bd){
         return ret.rows;
     }
 
-    this.getOneCartaoByNum = async function (numero){
+    this.getOneCartaoByNum = async function (numCartao){
         const conexao = await this.bd.getConexao();
 
         const sqlSelectOne = "SELECT NUM_CARTAO,TO_CHAR(CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')" + 
                                 "FROM Cartoes WHERE NUM_CARTAO = :numCartao";
         
-        const dados = {numCartao: numero};
+        const dados = {numCartao: numCartao};
         ret = await conexao.execute(sqlSelectOne, dados);
         
         return ret.rows;
     }
 } 
 
-function Servico (codigo, nome, descricao, numCartao){
-    this.codigo = codigo;
+function Servico (codServico, nome, descricao, numCartao){
+    this.codServico = codServico;
     this.nome = nome;
     this.descricao = descricao;
     this.numCartao = numCartao;
@@ -79,7 +80,7 @@ function Servicos(bd){
         
         const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO)" + 
                         "VALUES (:codServico, :nome, :descricao)";
-        const dados = {codServico: servico.codigo, nome: servico.nome, descricao: servico.descricao};
+        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
@@ -96,6 +97,18 @@ function Servicos(bd){
         return ret.rows;
     }
 
+    this.getOneServiceByCode = async function(codServico){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectOne = "SELECT * FROM SERVICOS WHERE COD_SERVICO = :codServico";
+        const dados = {codServico: codServico};
+
+        ret = await conexao.execute(sqlSelectOne, dados);
+
+        console.log(ret);
+        return ret.rows;
+    }
+
     this.compraServico = async function(codServico, numCartao){
         const conexao = await this.bd.getConexao();
 
@@ -109,6 +122,7 @@ function Servicos(bd){
 
         console.log(result);
     }
+
 }
 
 function middleWareGlobal(req, res, next)
@@ -124,6 +138,7 @@ function middleWareGlobal(req, res, next)
 }
 
 async function criarCartao(req, res){
+    
     if(req.params.numCartao){
         return res.status(422).json();
     }
@@ -191,6 +206,31 @@ async function getOneCartaoByNum(req, res){
     }
 }
 
+
+async function getOneServiceByCode(req, res){
+    if(req.body.codServico)
+        return res.status(422).json();
+
+    const codServico = req.params.codServico;
+
+    let ret;
+    try{
+        ret = await global.servicos.getOneServiceByCode(codServico);  
+        console.log(ret);  
+    }
+    catch(err){}
+
+    if(ret.length == 0)
+    {
+        return res.status(404).json();
+    }
+    else {
+        servico = ret[0];
+        servico = new Servico(servico[0], servico[1], servico[2]);
+        return res.status(200).json(servico);
+    }
+}
+
 async function criarServico(req, res){
     if(req.params.codServico){
         return res.status(422).json();
@@ -250,8 +290,9 @@ async function compraServico(req, res){
     catch(err){
         console.error(err);
         return res.status(409).json();
-    }
+    }   
 }
+
 async function ligarServidor()
 {
     const bd = new BD();
@@ -259,9 +300,10 @@ async function ligarServidor()
     global.servicos = new Servicos(bd);
 
     const express = require('express');
-
+    const cors = require('cors');
     const app = express();
 
+    app.use(cors());
     app.use(express.json());
     app.use(middleWareGlobal);
 
@@ -271,8 +313,8 @@ async function ligarServidor()
 
     app.post('/servicos', criarServico);
     app.get('/servicos', getAllServicos);
-    app.post('/servicos/:codServico/:numCartao', compraServico);
-    //app.get('/servicos/:codigo', getOneServiceByCode)
+    app.put('/servicos/:codServico/:numCartao', compraServico);
+    app.get('/servicos/:codServico', getOneServiceByCode)
     //app.get('/servicos/cartoes/:numCartoes', getAllServicesByNumCard);
     
     app.listen(3000, () => {

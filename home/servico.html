@@ -6,14 +6,44 @@
     <link rel="stylesheet" href="servico.css">
     <title>Document</title>
 </head>
-<body>
+<body onload="getServicoByCodServico();">
     <a class="btnvoltar" href="Comprar.html"> Voltar </a>
 
     <div>
         <a class="font2">DESEJA CONFIRMAR A <br> COMPRA DESTE  SERVIÇO?</a>
     </div>
     
-    <a class="btnsim" href="Home.html"> Confirmar </a>
+    <a id="lblNome">Nome do Serviço: </a>  
+    <a id="lblDescricao">Descricao do Serviço: </a> 
+    <a class="btnsim" href="Home.html" onclick="comprarServico();"> Confirmar </a>
 
+    <script> 
+    const codServico = localStorage.getItem("codServico");
+    async function getServicoByCodServico(){
+        const url =  'http://localhost:3000/servicos/' + codServico;
+        const response = await fetch(url);
+        const servico = await response.json();
+
+        document.getElementById("lblNome").textContent = "Nome do Serviço: " + servico.nome;
+        document.getElementById("lblDescricao").textContent = "Descricao do Serviço:" + servico.descricao;
+        console.log(servico);
+    }
+
+    async function comprarServico(){
+        const numCartao = localStorage.getItem("numCartao");
+        console.log(numCartao);
+        const url = 'http://localhost:3000/servicos/' + codServico + '/' + numCartao;
+        console.log(url);
+        const body = {};
+
+        const response = await fetch(url, {
+                method: "PUT", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+    }
+    </script>
 </body>
 </html>
