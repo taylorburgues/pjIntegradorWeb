@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="geracao.css">
     <title>Document</title>
 </head>
-<body onload="showCardNumber();">
+<body>
 
     <div>
         <a class="btnvoltar2" href="Home.html"> Voltar </a>
@@ -20,7 +20,7 @@
     <script>
         const numCartao = rando(0,10000);
 
-        async function showCardNumber(){
+        function showCardNumber(){
             document.getElementById("numCartao").textContent = numCartao;
         }
 
@@ -39,6 +39,7 @@
             localStorage.setItem("numCartao", numCartao);
             const result = await response.json();
             console.log(result);
+            showCardNumber();
         }
         createCard();
     </script>

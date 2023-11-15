@@ -1,27 +1,38 @@
+* {
+    font-family: Gotham;
+    box-sizing: border-box;
+}
+
 body{
     background-image: url(../images/elipses.png);
     background-size: 100%;
     border: none;
     overflow: hidden;
+    margin: 0;
    
     padding: 0; /* Remova preenchimento padrão do corpo */
 
 }
 
 .logo {
-    
-    position: absolute;
-    margin-top: 50px;
-    left: 920px; /* Centralize a imagem horizontalmente */
-    transform: translateX(-50%); /* Centralize a imagem horizontalmente */
     max-width: 30%; /* Garanta que a imagem não ultrapasse a largura do corpo */
 }
 
-
 .wrapper {
+    padding: 100px 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 200px;
+}
+
+.buttons {
     display: flex;
     flex-wrap: wrap;
-    padding: 10px;
+    justify-content: space-between;
+    padding: 10px 100px;
+    max-width: 1200px;
+    width: 100%;
   }
 
 @font-face {
@@ -29,12 +40,9 @@ body{
     src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
 }
   
-.button1 {
-    font-family: Gotham;
-    display: inline-block;
-    margin-left: 350px;
-    margin-top: 380px;
-    padding: 100px 60px;
+.btn {
+    display: block;
+    padding: 100px 50px;
     font-size: 24px;
     cursor: pointer;
     text-align: center;
@@ -45,40 +53,11 @@ body{
     border: none;
     border-radius: 15px;
     box-shadow: 0 4px #595959;
-}
-
-.button2 {
-    font-family: Gotham;
-    display: inline-block;
-    margin-left: 200px;
-    padding: 100px 70px;
-    font-size: 24px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    outline: none;
-    color: #fff;
-    background-color: #707070;
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px #595959;
-}
-
-.button3 {
-    font-family: Gotham;
-    display: inline-block;
-    margin-left: 200px;
-    padding: 115px 30px;
-    font-size: 24px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    outline: none;
-    color: #fff;
-    background-color: #707070;
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px #595959;
+    max-width: 280px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
   
 .button1:hover {

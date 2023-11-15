@@ -1,6 +1,8 @@
 body{
     background-image: url(../images/elipses.png);
     background-size: 100%;
+    display: flex; /* deixa o layout flexivel */
+    flex-direction: column;
 }
 
 @font-face {
@@ -11,8 +13,8 @@ body{
 .btnvoltar{
     font-family: Gotham;
     display: inline-block;
-    margin-left: 20px;
-    margin-top: 20px;
+    left: 20px;
+    top: 20px;
     padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
@@ -23,6 +25,8 @@ body{
     background-color: #707070;
     border: none;
     border-radius: 40px;
+    position: fixed;
+
 }
 
 .btnvoltar:hover {
@@ -63,8 +67,8 @@ body{
 .btnvoltar2{
     font-family: Gotham;
     display: inline-block;
-    margin-left: 20px;
-    margin-top: 20px;
+    left: 20px;
+    top: 20px;
     padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
@@ -75,6 +79,8 @@ body{
     background-color: #707070;
     border: none;
     border-radius: 40px;
+    position: fixed;
+
 }
 
 .btnvoltar2:hover {
@@ -85,7 +91,7 @@ body{
 .font2{
     font-family: Gotham;
     font-size: 50px;
-    position: absolute; 
+    position: absolute;
 	left: 430px;
 	top: 200px;
 }
