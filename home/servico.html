@@ -18,8 +18,7 @@
     <a class="btnsim" href="Home.html" onclick="comprarServico();"> Confirmar </a>
 
     <script> 
-    const codServico = localStorage.getItem("codServico");
-    async function getServicoByCodServico(){
+    async function getServicoByCodServico(codServico){
         const url =  'http://localhost:3000/servicos/' + codServico;
         const response = await fetch(url);
         const servico = await response.json();
@@ -27,13 +26,16 @@
         document.getElementById("lblNome").textContent = "Nome do Serviço: " + servico.nome;
         document.getElementById("lblDescricao").textContent = "Descricao do Serviço:" + servico.descricao;
         console.log(servico);
+        return servico;
     }
 
     async function comprarServico(){
         const numCartao = localStorage.getItem("numCartao");
         console.log(numCartao);
+
         const url = 'http://localhost:3000/servicos/' + codServico + '/' + numCartao;
         console.log(url);
+
         const body = {};
 
         const response = await fetch(url, {
@@ -43,6 +45,9 @@
                 },
                 body: JSON.stringify(body),
             });
+
+        const codServico = localStorage.getItem("codServico");
+
     }
     </script>
 </body>
