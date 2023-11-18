@@ -9,7 +9,6 @@ body{
     border: none;
     overflow: hidden;
     margin: 0;
-   
     padding: 0; /* Remova preenchimento padrão do corpo */
 
 }
@@ -27,6 +26,7 @@ body{
 }
 
 .buttons {
+    
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -34,6 +34,7 @@ body{
     max-width: 1200px;
     width: 100%;
   }
+  
 
 @font-face {
     font-family: Gotham;
