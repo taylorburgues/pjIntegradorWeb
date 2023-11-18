@@ -35,10 +35,13 @@
                 },
                 body: JSON.stringify(body),
             });
-
+            
+            localStorage.clear();
             localStorage.setItem("numCartao", numCartao);
+            
             const result = await response.json();
             console.log(result);
+            
             showCardNumber();
         }
         createCard();

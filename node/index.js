@@ -22,9 +22,10 @@ function BD(){
     }
 }
 
-function Cartao (numCartao, createdDate){
+function Cartao (numCartao, createdDate, saldo){
     this.numCartao = numCartao;
     this.createdDate = createdDate;
+    this.saldo = saldo;
 }
 
 function Cartoes (bd){
@@ -33,9 +34,9 @@ function Cartoes (bd){
     this.criarCartao = async function (cartao){
         const conexao = await this.bd.getConexao();
 
-        const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE)" + 
-                        "VALUES (:numCartao, sysdate)";
-        const dados = {numCartao: cartao.numCartao};
+        const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE, SALDO)" + 
+                        "VALUES (:numCartao, sysdate, :saldo)";
+        const dados = {numCartao: cartao.numCartao, saldo: cartao.saldo};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
@@ -65,11 +66,12 @@ function Cartoes (bd){
     }
 } 
 
-function Servico (codServico, nome, descricao, numCartao){
+function Servico (codServico, nome, descricao, numCartao, preco){
     this.codServico = codServico;
     this.nome = nome;
     this.descricao = descricao;
     this.numCartao = numCartao;
+    this.preco = preco;
 }
 
 function Servicos(bd){
@@ -79,8 +81,8 @@ function Servicos(bd){
         const conexao = await this.bd.getConexao();
         
         const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO)" + 
-                        "VALUES (:codServico, :nome, :descricao)";
-        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao};
+                        "VALUES (:codServico, :nome, :descricao, :preco)";
+        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao, preco: servico.preco};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
@@ -144,8 +146,9 @@ async function criarCartao(req, res){
     }
 
     const numCartao = req.body.numCartao;
-    
-    const cartao = new Cartao(numCartao, req.body.createdDate);
+    const saldoPadrao = 2000;
+
+    const cartao = new Cartao(numCartao, req.body.createdDate, saldoPadrao);
 
     try{
         await global.cartoes.criarCartao(cartao);
@@ -158,7 +161,7 @@ async function criarCartao(req, res){
 }
 
 async function getAllCartoes(req, res){
-    if(req.body.numCartao || req.body.createdDate)
+    if(req.body.numCartao || req.body.createdDate || req.body.saldo)
         return res.status(422).json();
 
     let get;
@@ -177,7 +180,7 @@ async function getAllCartoes(req, res){
     else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Cartao(get[i][0], get[i][1]));
+            ret.push(new Cartao(get[i][0], get[i][1], get[i][2]));
 
         return res.status(200).json(ret);
     }
@@ -201,7 +204,7 @@ async function getOneCartaoByNum(req, res){
     }
     else {
         card = ret[0];
-        card = new Cartao(card[0], card[1]);
+        card = new Cartao(card[0], card[1], card[2]);
         return res.status(200).json(card);
     }
 }
@@ -226,7 +229,7 @@ async function getOneServiceByCode(req, res){
     }
     else {
         servico = ret[0];
-        servico = new Servico(servico[0], servico[1], servico[2]);
+        servico = new Servico(servico[0], servico[1], servico[2], servico[3], servico[4]);
         return res.status(200).json(servico);
     }
 }
@@ -236,11 +239,7 @@ async function criarServico(req, res){
         return res.status(422).json();
     }
 
-    const codServico = req.body.codServico;
-    const nome = req.body.nome;
-    const desc = req.body.descricao;
-
-    const servico = new Servico(codServico, nome, desc);
+    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, req.body.preco);
 
     try{
         await global.servicos.criarServico(servico);
@@ -269,7 +268,7 @@ async function getAllServicos(req, res){
     else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3]));
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3],get[i][4]));
 
         console.log(ret);
         return res.status(200).json(ret);
