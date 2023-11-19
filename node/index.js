@@ -1,9 +1,7 @@
 
 
 function BD(){
-    //process.env.ORA_SDTZ = 'UTC-3';
-
-    this.getConexao = async function (){
+    this.getConexao = function (){
         if (global.conexao)
             return global.conexao;
 
@@ -11,7 +9,7 @@ function BD(){
 
         try 
         {
-            global.conexao = await oracledb.getConnection({user: 'system', password: 'pioracle', connectString: 'localhost/xe', timezone: 'UTC-3'});
+            global.conexao = oracledb.getConnection({user: 'system', password: 'pioracle', connectString: 'localhost/xe', timezone: 'UTC-3'});
         }
         catch (err){
             console.error(err);
@@ -56,13 +54,25 @@ function Cartoes (bd){
     this.getOneCartaoByNum = async function (numCartao){
         const conexao = await this.bd.getConexao();
 
-        const sqlSelectOne = "SELECT NUM_CARTAO,TO_CHAR(CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')" + 
-                                "FROM Cartoes WHERE NUM_CARTAO = :numCartao";
+        const sqlSelectOne = "SELECT * FROM Cartoes WHERE NUM_CARTAO = :numCartao";
         
         const dados = {numCartao: numCartao};
         ret = await conexao.execute(sqlSelectOne, dados);
         
         return ret.rows;
+    }
+
+    this.alterarSaldoCartao = async function (numCartao, novoSaldo){
+        const conexao = await this.bd.getConexao();
+
+        const sqlUpdate = "UPDATE CARTOES " +
+                            "SET SALDO = :novoSaldo " + 
+                            "WHERE NUM_CARTAO = :numCartao";
+
+        const dados = {novoSaldo: novoSaldo, numCartao: numCartao};
+        const result = await conexao.execute(sqlUpdate, dados, {autoCommit: true});
+
+        console.log(result);
     }
 } 
 
@@ -80,7 +90,7 @@ function Servicos(bd){
     this.criarServico = async function (servico){
         const conexao = await this.bd.getConexao();
         
-        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO)" + 
+        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO, PRECO) " + 
                         "VALUES (:codServico, :nome, :descricao, :preco)";
         const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao, preco: servico.preco};
         console.log(sqlInsert, dados);
@@ -91,11 +101,13 @@ function Servicos(bd){
     
     this.getAllServicos = async function (){
         const conexao = await this.bd.getConexao();
+        console.log(conexao);
 
         const sqlSelectAll = "SELECT * FROM SERVICOS";
         
         ret = await conexao.execute(sqlSelectAll);
 
+        //console.log(ret);
         return ret.rows;
     }
 
@@ -124,7 +136,6 @@ function Servicos(bd){
 
         console.log(result);
     }
-
 }
 
 function middleWareGlobal(req, res, next)
@@ -204,11 +215,30 @@ async function getOneCartaoByNum(req, res){
     }
     else {
         card = ret[0];
+        console.log(card);
         card = new Cartao(card[0], card[1], card[2]);
+        console.log(card);
         return res.status(200).json(card);
     }
 }
 
+async function alterarSaldoCartao(req, res){
+    if(!req.body.novoSaldo)
+        return res.status(422).json();
+
+    const numCartao = req.params.numCartao;
+
+    let put;
+    try{
+        put = await global.cartoes.alterarSaldoCartao(numCartao, req.body.novoSaldo);
+        console.log(put);
+        return res.status(201).json();
+    }
+    catch(exception){
+        console.error(exception);
+    }
+
+}
 
 async function getOneServiceByCode(req, res){
     if(req.body.codServico)
@@ -239,11 +269,11 @@ async function criarServico(req, res){
         return res.status(422).json();
     }
 
-    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, req.body.preco);
+    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, null, req.body.preco);
 
     try{
         await global.servicos.criarServico(servico);
-        return res.status(201).json(codServico);
+        return res.status(201).json(req.body.codServico);
     }
     catch(err){
         console.error(err);
@@ -295,8 +325,8 @@ async function compraServico(req, res){
 async function ligarServidor()
 {
     const bd = new BD();
-    global.cartoes = new Cartoes (bd);
     global.servicos = new Servicos(bd);
+    global.cartoes = new Cartoes (bd);
 
     const express = require('express');
     const cors = require('cors');
@@ -309,12 +339,13 @@ async function ligarServidor()
     app.post('/cartoes', criarCartao);
     app.get('/cartoes', getAllCartoes);
     app.get('/cartoes/:numCartao', getOneCartaoByNum);
+    app.put('/cartoes/:numCartao/saldo', alterarSaldoCartao);
 
     app.post('/servicos', criarServico);
     app.get('/servicos', getAllServicos);
     app.put('/servicos/:codServico/:numCartao', compraServico);
     app.get('/servicos/:codServico', getOneServiceByCode)
-    //app.get('/servicos/cartoes/:numCartoes', getAllServicesByNumCard);
+    //app.get('/servicos/cartoes/:numCartao', getAllServicesByNumCard);
     
     app.listen(3000, () => {
         console.log('App is running on port 3000');

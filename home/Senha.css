@@ -54,7 +54,22 @@ body{
     border-radius: 6px;
     box-shadow: 0 4px #595959;
 }
-
+.btnvoltar{
+    display: inline-block;
+    left: 10px;
+    top: 20px;
+    padding: 10px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 40px;
+    position: fixed;
+}
 
 
 .search-container {

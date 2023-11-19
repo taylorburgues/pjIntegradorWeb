@@ -7,35 +7,35 @@
     <title>Senha</title>
 </head>
 <body>
-    
+    <a class="btnvoltar" href="servico.html"> Voltar </a>
 
     <div class="wrapper">
         <div>
-            <a class="font">ESCOLHA SEU SERVIÇO</a>
+            <a class="font">DIGITE O NÚMERO DO CARTÃO  <br> PARA FINALIZAR A COMPRA</a>
         </div>
 
         <form class="search-container">
-            <input type="text" id="search-bar" placeholder="Busca">
+            <input type="text" id="search-bar" placeholder="Digitar">
             <a href="#"></a>
           </form>
         
         <div class="button-container">
             <div class="button-column">
-                <a class="button" href="servico.html" >  1 </a>
-                <a class="button" href="servico.html" >  2 </a>
-                <a class="button" href="servico.html" >  3 </a>
+                <a class="button" onclick="writeCardChar(1)">  1 </a>
+                <a class="button" onclick="writeCardChar(2)">  2 </a>
+                <a class="button"  onclick="writeCardChar(3)">  3 </a>
             </div>
             <div class="button-column">
-                <a class="button" href="servico.html" >  4 </a>
-                <a class="button" href="servico.html" >  5 </a>
-                <a class="button" href="servico.html" >  6 </a>
-                <a class="button" href="servico.html" >  0 </a>
+                <a class="button" onclick="writeCardChar(4)">  4 </a>
+                <a class="button" onclick="writeCardChar(5)">  5 </a>
+                <a class="button" onclick="writeCardChar(6)">  6 </a>
+                <a class="button" onclick="writeCardChar(0)">  0 </a>
             </div>
             <div class="button-column">
-                <a class="button" href="servico.html">  7 </a>
-                <a class="button" href="servico.html">  8 </a>
-                <a class="button" href="servico.html">  9 </a>
-                <a class="button" href="servico.html">  CONFIRMAR </a>
+                <a class="button" onclick="writeCardChar(7)">  7 </a>
+                <a class="button" onclick="writeCardChar(8)">  8 </a>
+                <a class="button" onclick="writeCardChar(9)">  9 </a>
+                <a class="button" onclick="comprarServico()">  CONFIRMAR </a>
             </div>
             
         </div> 
@@ -43,5 +43,84 @@
         
     </div>
     
+    <script>
+        const codServico = localStorage.getItem("codServico");
+
+        function writeCardChar(char){
+            document.getElementById("search-bar").value += char;
+        }
+
+        async function comprarServico(){
+            try{
+                const numCartao = document.getElementById("search-bar").value;
+                console.log(numCartao);
+
+                if(await validaSaldoDoCartao(numCartao)){
+                    const url = 'http://localhost:3000/servicos/' + codServico + '/' + numCartao;
+                        
+
+                    const body = {};
+
+                    const response = await fetch(url, {
+                            method: "PUT", // or 'PUT'
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(body),
+                    });
+
+                    console.log("Serviço " + codServico + " comprado no cartão" + numCartao);
+                }
+                else
+                    console.log("O cartão " + numCartao + "não tem saldo para comprar o serviço"+ codServico);
+            } catch(exception){
+                console.error(exception);
+            }
+        }
+        
+        async function validaSaldoDoCartao(numCartao){
+            const urlCartao =  'http://localhost:3000/cartoes/' + numCartao;
+            const responseCartao = await fetch(urlCartao);
+
+            const urlServico = 'http://localhost:3000/servicos/' + codServico;
+            const responseServico = await fetch(urlServico);
+
+            const cartao = await responseCartao.json();
+            const servico = await responseServico.json();
+
+            console.log(cartao);
+            console.log(servico);
+
+            console.log(cartao.saldo >= servico.preco);
+            if(cartao.saldo >= servico.preco){
+                const saldoCompra = cartao.saldo - servico.preco;
+                await alteraSaldoERecompensaCartao(numCartao, saldoCompra, servico.preco);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        async function alteraSaldoERecompensaCartao(numCartao, saldoCartao, precoServico){
+            const recompensa = precoServico * 0.3;
+            const novoSaldo = saldoCartao + recompensa;
+
+            const urlRecompensa = 'http://localhost:3000/cartoes/' + numCartao + '/saldo';
+            console.log(urlRecompensa);
+            
+            const body = {novoSaldo: novoSaldo};
+            console.log(body);
+            
+            const response = await fetch(urlRecompensa, {
+                        method: "PUT", // or 'PUT'
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(body),
+            });
+
+            console.log(response);
+        }
+    </script>
 </body>
 </html>

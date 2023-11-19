@@ -15,39 +15,21 @@
     
     <a id="lblNome">Nome do Serviço: </a>  
     <a id="lblDescricao">Descricao do Serviço: </a> 
-    <a class="btnsim" href="Senha.html" onclick="comprarServico();"> Confirmar </a>
+    <a id="lblPreco">Preço do Serviço: </a> 
+    <a class="btnsim" href="Senha.html" onclick="getServicoByCodServico();"> Confirmar </a>
 
     <script> 
-    async function getServicoByCodServico(codServico){
+    async function getServicoByCodServico(){
+        const codServico = localStorage.getItem("codServico");
         const url =  'http://localhost:3000/servicos/' + codServico;
         const response = await fetch(url);
         const servico = await response.json();
 
         document.getElementById("lblNome").textContent = "Nome do Serviço: " + servico.nome;
-        document.getElementById("lblDescricao").textContent = "Descricao do Serviço:" + servico.descricao;
+        document.getElementById("lblDescricao").textContent = "Descricao do Serviço: " + servico.descricao;
+        document.getElementById("lblPreco").textContent = "Preço do Serviço: " + servico.preco;
         console.log(servico);
         return servico;
-    }
-
-    async function comprarServico(){
-        const numCartao = localStorage.getItem("numCartao");
-        console.log(numCartao);
-
-        const url = 'http://localhost:3000/servicos/' + codServico + '/' + numCartao;
-        console.log(url);
-
-        const body = {};
-
-        const response = await fetch(url, {
-                method: "PUT", // or 'PUT'
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            });
-
-        const codServico = localStorage.getItem("codServico");
-
     }
     </script>
 </body>
