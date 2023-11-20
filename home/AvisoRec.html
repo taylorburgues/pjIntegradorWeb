@@ -10,7 +10,7 @@
 
     <a class="btnvoltar" href="Home.html"> Voltar </a>
     <div>
-        <a class="btn">OK</a>
+        <a class="btn" onclick="createAllServiceElements()">Pesquisar</a>
         <form class="search-container">
             <input type="text" id="search-bar" placeholder="Digite sua senha:">
             <a href="#"></a>
@@ -21,7 +21,49 @@
         </form>
 
     </div>
+
+    <div>
+        <form id="services">
+        </form>
+    </div>
     
+<script>
+    const numCartao = document.getElementById("search-bar").value;
+    console.log(numCartao);
     
+    async function createAllServiceElements(){
+        let get;
+        get = await findAllServicesBuyable(numCartao);
+
+        console.log(get);
+        
+        var form = document.getElementById("services");
+
+        for(i=0;i<get.length;i++){
+            var divNova = document.createElement("div");    
+
+            var nodeCode = document.createTextNode("Código do serviço: " + get[i][0]);
+            var nodeName = document.createTextNode("Nome do serviço: " + get[i][1]);
+            var nodeDesc = document.createTextNode("Descrição do serviço: " + get[i][2]);
+            var nodePreco = document.createTextNode("Preço do serviço: " + get[i][4]);
+
+            divNova.appendChild(nodeCode);
+            divNova.appendChild(nodeName);
+            divNova.appendChild(nodeDesc);
+            divNova.appendChild(nodePreco);
+
+            form.appendChild(divNova);
+        }
+    }
+
+    async function findAllServicesBuyable(numCartao){
+        const url = "http://localhost:3000/servicos/cartoes/" + numCartao;
+        const response = await fetch(url);
+
+        let servicosDisponiveis = response.json();
+
+        return servicosDisponiveis;
+    }
+</script>
 </body>
 </html>

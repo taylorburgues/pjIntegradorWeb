@@ -6,14 +6,22 @@
     <link rel="stylesheet" href="Recompensa.css">
     <title>Document</title>
 </head>
-<body>
+<body onload="exibePontos()">
     <div>
         <a class="btnvoltar" href="Home.html"> Voltar </a>
     </div>
 
     <div>
-        <a class="font">VOCÊ GANHOU: </a>
+        <a class="font" id="pontosRec">OBRIGADO POR COMPRAR, SEU SALDO <br> APÓS A COMPRA É DE: </a>
     </div>
     
 </body>
+<script>
+
+    function exibePontos(){
+        const saldo = localStorage.getItem("saldo");
+
+        document.getElementById("pontosRec").textContent += saldo + ' PONTOS';
+    }
+</script>
 </html>

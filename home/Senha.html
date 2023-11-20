@@ -36,7 +36,7 @@
                 <a class="button" onclick="writeCardChar(7)">  7 </a>
                 <a class="button" onclick="writeCardChar(8)">  8 </a>
                 <a class="button" onclick="writeCardChar(9)">  9 </a>
-                <a class="button" onclick="comprarServico()" href="Recompensa.html">  CONFIRMAR </a>
+                <a class="button" onclick="comprarServico()">  CONFIRMAR </a>
             </div>
             
         </div> 
@@ -71,6 +71,7 @@
                     });
 
                     console.log("Serviço " + codServico + " comprado no cartão" + numCartao);
+                    window.location.href = "Recompensa.html";
                 }
                 else
                     console.log("O cartão " + numCartao + "não tem saldo para comprar o serviço"+ codServico);
@@ -89,10 +90,6 @@
             const cartao = await responseCartao.json();
             const servico = await responseServico.json();
 
-            console.log(cartao);
-            console.log(servico);
-
-            console.log(cartao.saldo >= servico.preco);
             if(cartao.saldo >= servico.preco){
                 const saldoCompra = cartao.saldo - servico.preco;
                 await alteraSaldoERecompensaCartao(numCartao, saldoCompra, servico.preco);
@@ -105,12 +102,10 @@
         async function alteraSaldoERecompensaCartao(numCartao, saldoCartao, precoServico){
             const recompensa = precoServico * 0.3;
             const novoSaldo = saldoCartao + recompensa;
-
+            
             const urlRecompensa = 'http://localhost:3000/cartoes/' + numCartao + '/saldo';
-            console.log(urlRecompensa);
             
             const body = {novoSaldo: novoSaldo};
-            console.log(body);
             
             const response = await fetch(urlRecompensa, {
                         method: "PUT", // or 'PUT'
@@ -120,6 +115,7 @@
                         body: JSON.stringify(body),
             });
 
+            localStorage.setItem("saldo", novoSaldo.toString());
             console.log(response);
         }
     </script>

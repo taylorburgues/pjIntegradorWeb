@@ -13,15 +13,14 @@
     </div>
 
     <div>
-        <a class="font2">SEU NÚMERO DE CARTÃO É:</a>
-        <a id="numCartao"></a>  
+        <a class="font2" id="numCartao">SEU NÚMERO DE CARTÃO É: <br> </a>
     </div>
     <script src="https://randojs.com/1.0.0.js"></script>
     <script>
         const numCartao = rando(0,10000);
 
         function showCardNumber(){
-            document.getElementById("numCartao").textContent = numCartao;
+            document.getElementById("numCartao").textContent += numCartao;
         }
 
         async function createCard(){

@@ -136,6 +136,19 @@ function Servicos(bd){
 
         console.log(result);
     }
+
+    this.getAllServicesBySaldoCartao = async function(numCartao){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectByPrice = "SELECT * FROM SERVICOS WHERE " +
+                                    "PRECO < (SELECT SALDO FROM CARTOES WHERE NUM_CARTAO = :numCartao)";
+
+        const dados = {numCartao: numCartao};
+        ret = await conexao.execute(sqlSelectByPrice, dados);
+
+        console.log(ret);
+        return ret.rows;
+    }
 }
 
 function middleWareGlobal(req, res, next)
@@ -291,7 +304,7 @@ async function getAllServicos(req, res){
     catch(exception)
     {}
 
-    if(typeof get === 'undefined')
+    if(get.length == 0)
     {
         return res.status(404).json([]);
     }
@@ -322,6 +335,29 @@ async function compraServico(req, res){
     }   
 }
 
+async function getAllServicesBySaldoCartao(req, res){
+    if(req.body.numCartao)
+        return res.status(422).json();
+
+    let get;
+    const numCartao = req.params.numCartao;
+
+    try{
+        get = await global.servicos.getAllServicesBySaldoCartao(numCartao);
+    }catch(err){}
+
+    if(get.length == 0){
+        return res.status(404).json([]);
+    } else{
+        const ret = [];
+        for(i=0;i<get.length;i++)
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3],get[i][4]));
+
+        console.log(ret);
+        return res.status(200).json(ret);    
+    }
+}
+
 async function ligarServidor()
 {
     const bd = new BD();
@@ -344,8 +380,8 @@ async function ligarServidor()
     app.post('/servicos', criarServico);
     app.get('/servicos', getAllServicos);
     app.put('/servicos/:codServico/:numCartao', compraServico);
-    app.get('/servicos/:codServico', getOneServiceByCode)
-    //app.get('/servicos/cartoes/:numCartao', getAllServicesByNumCard);
+    app.get('/servicos/:codServico', getOneServiceByCode);
+    app.get('/servicos/cartoes/:numCartao', getAllServicesBySaldoCartao);
     
     app.listen(3000, () => {
         console.log('App is running on port 3000');
