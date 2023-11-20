@@ -1,6 +1,5 @@
 * {
     font-family: Gotham;
-    box-sizing: border-box;
 }
 
 body{
@@ -9,7 +8,7 @@ body{
     border: none;
     overflow: hidden;
     margin: 0;
-    padding: 0; /* Remova preenchimento padrão do corpo */
+    padding: 0; /* Remove preenchimento padrão do corpo */
 
 }
 
@@ -54,6 +53,11 @@ body{
     border-radius: 6px;
     box-shadow: 0 4px #595959;
 }
+.button:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
 .btnvoltar{
     display: inline-block;
     left: 10px;
@@ -71,12 +75,16 @@ body{
     position: fixed;
 }
 
+.btnvoltar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
 
 .search-container {
     width: 490px;
     display: block;
     margin: 0 auto;
-    margin-top: 200px; /* Add margin-top property */
+    margin-top: 250px; /* Add margin-top property */
 }
 
 input#search-bar {
@@ -85,14 +93,15 @@ input#search-bar {
     height: 45px;
     padding: 0 20px;
     font-size: 1rem;
-    border: 1px solid #D0CFCE;
+    border: 2px solid #D0CFCE;
+    border-radius: 40px;
     outline: none;
 }
 .font{
     font-size: 50px;
     position: absolute; 
-	left: 420px;
-	top: 100px;
+	left: 330px;
+	top: 80px;
 }
   
   

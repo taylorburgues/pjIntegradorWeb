@@ -8,15 +8,23 @@
 </head>
 <body onload="getServicoByCodServico();">
     <a class="btnvoltar" href="Comprar.html"> Voltar </a>
-
+    
+    <div class="wrapper">
+        <a id="lblNome">Nome do Serviço: </a>  
+        <br>
+        <a id="lblDescricao">Descricao do Serviço: </a> 
+        <br>
+        <a id="lblPreco">Preço do Serviço: </a> 
+        <br>
+    </div>
     <div>
         <a class="font2">DESEJA CONFIRMAR A <br> COMPRA DESTE  SERVIÇO?</a>
+        <a class="btnsim" href="Senha.html" onclick="getServicoByCodServico();"> Confirmar </a>
     </div>
+ 
     
-    <a id="lblNome">Nome do Serviço: </a>  
-    <a id="lblDescricao">Descricao do Serviço: </a> 
-    <a id="lblPreco">Preço do Serviço: </a> 
-    <a class="btnsim" href="Senha.html" onclick="getServicoByCodServico();"> Confirmar </a>
+    
+    
 
     <script> 
     async function getServicoByCodServico(){

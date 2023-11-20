@@ -1,0 +1,44 @@
+* {
+    font-family: Gotham;
+}
+
+body{
+    background-image: url(../images/elipses.png);
+    background-size: 100%;
+    border: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0; 
+
+}
+
+.btnvoltar{
+    font-family: Gotham;
+    display: inline-block;
+    left: 20px;
+    top: 20px;
+    padding: 10px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 40px;
+    position: fixed;
+
+}
+
+.btnvoltar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.font{
+    font-size: 50px;
+    position: absolute; 
+	left: 400px;
+	top: 180px;
+}

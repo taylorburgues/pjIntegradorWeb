@@ -20,10 +20,6 @@ body{
     margin: 0;
 }
 
-@font-face {
-    font-family: Gotham;
-    src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
-}
 
 .button-container {
     display: flex;
@@ -78,10 +74,10 @@ body{
     background-color: #d4d4d4
 }
 
-.font2{
+.font{
     font-size: 50px;
     position: absolute; 
-	left: 480px;
-	top: 230px;
+	left: 390px;
+	top: 140px;
 }
 

@@ -5,23 +5,36 @@
 body{
     background-image: url(../images/elipses.png);
     background-size: 100%;
-    display: flex;
-    flex-direction: column;
+    border: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0; 
+
 }
 
-.wrapper{
-    font-size: 20px;
-    margin-top: 300px;
-    margin-left: 410px;
-    display: flex;
-    flex-direction: column;
+.search-container {
+    width: 490px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 150px; /* Add margin-top property */
+    margin-left:400px;
 }
 
+input#search-bar {
+    margin: 0 auto;
+    width: 60%;
+    height: 45px;
+    padding: 0 20px;
+    font-size: 1rem;
+    border: 2px solid #D0CFCE;
+    border-radius: 40px;
+    outline: none;
+}
 
-.btnsim{
+.btn{
     display: inline-block;
-    margin-left: 600px;
-	margin-top: 30px;
+    margin-left: 800px;
+    top: 150px;
     padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
@@ -32,16 +45,12 @@ body{
     background-color: #707070;
     border: none;
     border-radius: 40px;
-}
-
-.btnsim:hover {
-    color: #bebebe;
-    background-color: #d4d4d4
+    position: fixed;
 }
 
 .btnvoltar{
     display: inline-block;
-    left: 10px;
+    left: 20px;
     top: 20px;
     padding: 10px 40px;
     font-size: 24px;
@@ -60,11 +69,3 @@ body{
     color: #bebebe;
     background-color: #d4d4d4
 }
-
-.font2{
-    font-size: 50px;
-    position: absolute; 
-	left: 410px;
-	top: 110px;
-}
-

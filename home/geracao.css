@@ -1,14 +1,16 @@
+* {
+    font-family: Gotham;
+}
+
 body{
     background-image: url(../images/elipses.png);
     background-size: 100%;
     display: flex; /* deixa o layout flexivel */
-    flex-direction: column;
+    flex-direction: column; 
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
-@font-face {
-    font-family: Gotham;
-    src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
-}
 
 .btnvoltar{
     font-family: Gotham;
@@ -35,17 +37,16 @@ body{
 }
 
 .font{
-    font-family: Gotham;
     font-size: 50px;
     position: absolute; 
-	left: 500px;
-	top: 240px;
+	left: 400px;
+	top: 180px;
 }
 
-.btngerar{
+.btngerarr{
     font-family: Gotham;
     display: inline-block;
-    margin-left: 660px;
+
 	margin-top: 340px;
     padding: 10px 40px;
     font-size: 24px;
@@ -57,6 +58,34 @@ body{
     background-color: #707070;
     border: none;
     border-radius: 40px;
+}
+
+.btn {
+    
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 30% 40%;
+    
+    width: 100%;
+}
+
+.btngerar { 
+    display: block;
+    padding: 20px 1px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px #595959;
+    max-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btngerar:hover {
@@ -89,10 +118,9 @@ body{
 }
 
 .font2{
-    font-family: Gotham;
     font-size: 50px;
     position: absolute;
-	left: 430px;
+	left: 340px;
 	top: 200px;
 }
 

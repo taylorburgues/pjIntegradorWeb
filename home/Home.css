@@ -1,6 +1,5 @@
 * {
     font-family: Gotham;
-    box-sizing: border-box;
 }
 
 body{
@@ -9,12 +8,14 @@ body{
     border: none;
     overflow: hidden;
     margin: 0;
-    padding: 0; /* Remova preenchimento padrão do corpo */
+    padding: 0; 
 
 }
 
 .logo {
-    max-width: 30%; /* Garanta que a imagem não ultrapasse a largura do corpo */
+    max-width: 500px;
+    margin-left: 450px;
+    margin-top: 40px; 
 }
 
 .wrapper {
@@ -26,24 +27,18 @@ body{
 }
 
 .buttons {
-    
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 10px 100px;
     max-width: 1200px;
     width: 100%;
-  }
-  
-
-@font-face {
-    font-family: Gotham;
-    src: local(Gotham), url(../serviços/iCiel\ gotham\ ultra.ttf);
 }
   
-.btn {
+  
+.btn { 
     display: block;
-    padding: 100px 50px;
+    padding: 80px 3px;
     font-size: 24px;
     cursor: pointer;
     text-align: center;
