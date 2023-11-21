@@ -15,11 +15,7 @@
             <input type="text" id="search-bar" placeholder="Digite sua senha:">
             <a href="#"></a>
         </form>
-            <input type="text" id="search-barr">
-        <form> 
-
-        </form>
-
+        <a id="lblSaldo"> O saldo atual do cartão é de: </a>
     </div>
 
     <div>
@@ -28,10 +24,19 @@
     </div>
     
 <script>
-    const numCartao = document.getElementById("search-bar").value;
-    console.log(numCartao);
-    
+
     async function createAllServiceElements(){
+        const numCartao = document.getElementById("search-bar").value;
+        console.log(numCartao);
+
+        const url = "http://localhost:3000/cartoes/" + numCartao;
+        const response = await fetch(url);
+        const cartao = await response.json();
+
+        console.log(cartao);
+
+        document.getElementById("lblSaldo").textContent += cartao.saldo;
+
         let get;
         get = await findAllServicesBuyable(numCartao);
 
@@ -42,18 +47,13 @@
         for(i=0;i<get.length;i++){
             var divNova = document.createElement("div");    
 
-            var nodeCode = document.createTextNode("Código do serviço: " + get[i][0]);
-            var nodeName = document.createTextNode("Nome do serviço: " + get[i][1]);
-            var nodeDesc = document.createTextNode("Descrição do serviço: " + get[i][2]);
-            var nodePreco = document.createTextNode("Preço do serviço: " + get[i][4]);
-
-            divNova.appendChild(nodeCode);
-            divNova.appendChild(nodeName);
-            divNova.appendChild(nodeDesc);
-            divNova.appendChild(nodePreco);
+            divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
+            divNova.appendChild(document.createTextNode("Nome do serviço: " + get[i].nome+ "   "));
+            divNova.appendChild(document.createTextNode("Descrição do serviço: " + get[i].descricao+ "   "));
+            divNova.appendChild(document.createTextNode("Preço do serviço: " + get[i].preco+ "   "));
 
             form.appendChild(divNova);
-        }
+        }   
     }
 
     async function findAllServicesBuyable(numCartao){

@@ -39,44 +39,27 @@ body{
 .font{
     font-size: 50px;
     position: absolute; 
-	left: 400px;
+	left: 690px;
 	top: 180px;
-}
-
-.btngerarr{
-    font-family: Gotham;
-    display: inline-block;
-
-	margin-top: 340px;
-    padding: 10px 40px;
-    font-size: 24px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    outline: none;
-    color: #fff;
-    background-color: #707070;
-    border: none;
-    border-radius: 40px;
 }
 
 .btn {
     
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 30% 40%;
+    padding: 25% 42%;
     
     width: 100%;
 }
 
 .btngerar { 
     display: block;
-    padding: 20px 1px;
+    padding: 22px 1px;
     font-size: 24px;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
-    outline: none;
+    outline: none;  
     color: #fff;
     background-color: #707070;
     border: none;

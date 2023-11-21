@@ -11,8 +11,8 @@ body{
 
 .wrapper{
     font-size: 20px;
-    margin-top: 300px;
-    margin-left: 410px;
+    margin-top: 350px;
+    margin-left: 630px;
     display: flex;
     flex-direction: column;
 }
@@ -20,7 +20,7 @@ body{
 
 .btnsim{
     display: inline-block;
-    margin-left: 600px;
+    margin-left: 850px;
 	margin-top: 30px;
     padding: 10px 40px;
     font-size: 24px;
@@ -64,7 +64,7 @@ body{
 .font2{
     font-size: 50px;
     position: absolute; 
-	left: 410px;
-	top: 110px;
+	left: 630px;
+	top: 180px;
 }
 
