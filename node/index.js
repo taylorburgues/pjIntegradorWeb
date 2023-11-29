@@ -76,11 +76,10 @@ function Cartoes (bd){
     }
 } 
 
-function Servico (codServico, nome, descricao, numCartao, preco){
+function Servico (codServico, nome, descricao, preco){
     this.codServico = codServico;
     this.nome = nome;
     this.descricao = descricao;
-    this.numCartao = numCartao;
     this.preco = preco;
 }
 
@@ -123,19 +122,19 @@ function Servicos(bd){
         return ret.rows;
     }
 
-    this.compraServico = async function(codServico, numCartao){
+    /*this.compraServico = async function(codServico, numCartao){
         const conexao = await this.bd.getConexao();
 
         const sqlInsert = "UPDATE SERVICOS " +
                             "SET NUM_CARTAO = :numCartao " + 
                             "WHERE COD_SERVICO = :codServico";
-
+ 
         const dados = {numCartao: numCartao, codServico: codServico};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
 
         console.log(result);
-    }
+    }*/
 
     this.getAllServicesBySaldoCartao = async function(numCartao){
         const conexao = await this.bd.getConexao();
@@ -148,6 +147,30 @@ function Servicos(bd){
 
         console.log(ret);
         return ret.rows;
+    }
+}
+
+function Compra(codServico, numCartao, dataCompra, dataUtilizacao){
+    this.codServico = codServico;
+    this.numCartao = numCartao;
+    this.dataCompra = dataCompra;
+    this.dataUtilizacao = dataUtilizacao;
+}
+
+function Compras(bd){
+    this.bd = bd;
+
+    this.compraServico = async function(codServico, numCartao){
+        const conexao = await this.bd.getConexao();
+
+        const sqlInsert = "INSERT INTO COMPRAS (COD_SERVICO, NUM_CARTAO, DATA_COMPRA) "
+                            + "VALUES (:codServico, :numCartao, SYSDATE)";
+
+        const dados = {codServico: codServico, numCartao: numCartao};
+        console.log(sqlInsert, dados);
+        const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
+
+        console.log(result);
     }
 }
 
@@ -311,7 +334,7 @@ async function getAllServicos(req, res){
     else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3],get[i][4]));
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2],get[i][3]));
 
         console.log(ret);
         return res.status(200).json(ret);
@@ -326,7 +349,7 @@ async function compraServico(req, res){
     const numCartao = req.params.numCartao; 
 
     try{
-        await global.servicos.compraServico(codServico, numCartao);
+        await global.compras.compraServico(codServico, numCartao);
         return res.status(201).json({"codServico": codServico, "numCartao": numCartao});
     }
     catch(err){
@@ -363,6 +386,7 @@ async function ligarServidor()
     const bd = new BD();
     global.servicos = new Servicos(bd);
     global.cartoes = new Cartoes (bd);
+    global.compras = new Compras(bd);
 
     const express = require('express');
     const cors = require('cors');
@@ -379,9 +403,10 @@ async function ligarServidor()
 
     app.post('/servicos', criarServico);
     app.get('/servicos', getAllServicos);
-    app.put('/servicos/:codServico/:numCartao', compraServico);
     app.get('/servicos/:codServico', getOneServiceByCode);
     app.get('/servicos/cartoes/:numCartao', getAllServicesBySaldoCartao);
+
+    app.post('/compras/:codServico/:numCartao', compraServico);
     
     app.listen(3000, () => {
         console.log('App is running on port 3000');

@@ -57,13 +57,13 @@
                 console.log(numCartao);
 
                 if(await validaSaldoDoCartao(numCartao)){
-                    const url = 'http://localhost:3000/servicos/' + codServico + '/' + numCartao;
+                    const url = 'http://localhost:3000/compras/' + codServico + '/' + numCartao;
                         
 
                     const body = {};
 
                     const response = await fetch(url, {
-                            method: "PUT", // or 'PUT'
+                            method: "POST", // or 'PUT'
                             headers: {
                                 "Content-Type": "application/json",
                             },
