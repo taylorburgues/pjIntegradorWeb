@@ -56,10 +56,8 @@
                 const numCartao = document.getElementById("search-bar").value;
                 console.log(numCartao);
 
-                if(await validaSaldoDoCartao(numCartao)){
                     const url = 'http://localhost:3000/compras/' + codServico + '/' + numCartao;
                         
-
                     const body = {};
 
                     const response = await fetch(url, {
@@ -70,54 +68,15 @@
                             body: JSON.stringify(body),
                     });
 
-                    console.log("Serviço " + codServico + " comprado no cartão" + numCartao);
-                    window.location.href = "Recompensa.html";
+                    if(response.status == 201){
+                        console.log("Serviço " + codServico + " comprado no cartão" + numCartao);
+                        window.location.href = "Recompensa.html";
+                    }
+                } catch(exception){
+                    console.error(exception);
                 }
-                else
-                    console.log("O cartão " + numCartao + "não tem saldo para comprar o serviço"+ codServico);
-            } catch(exception){
-                console.error(exception);
-            }
         }
-        
-        async function validaSaldoDoCartao(numCartao){
-            const urlCartao =  'http://localhost:3000/cartoes/' + numCartao;
-            const responseCartao = await fetch(urlCartao);
-
-            const urlServico = 'http://localhost:3000/servicos/' + codServico;
-            const responseServico = await fetch(urlServico);
-
-            const cartao = await responseCartao.json();
-            const servico = await responseServico.json();
-
-            if(cartao.saldo >= servico.preco){
-                const saldoCompra = cartao.saldo - servico.preco;
-                await alteraSaldoERecompensaCartao(numCartao, saldoCompra, servico.preco);
-                return true;
-            }
-            else
-                return false;
-        }
-
-        async function alteraSaldoERecompensaCartao(numCartao, saldoCartao, precoServico){
-            const recompensa = precoServico * 0.3;
-            const novoSaldo = saldoCartao + recompensa;
-            
-            const urlRecompensa = 'http://localhost:3000/cartoes/' + numCartao + '/saldo';
-            
-            const body = {novoSaldo: novoSaldo};
-            
-            const response = await fetch(urlRecompensa, {
-                        method: "PUT", // or 'PUT'
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(body),
-            });
-
-            localStorage.setItem("saldo", novoSaldo.toString());
-            console.log(response);
-        }
+    
     </script>
 </body>
 </html>
