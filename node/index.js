@@ -62,10 +62,11 @@ function Cartoes (bd){
     }
 } 
 
-function Servico (codServico, nome, descricao){
+function Servico (codServico, nome, descricao, codRecompensa){
     this.codServico = codServico;
     this.nome = nome;
     this.descricao = descricao;
+    this.codRecompensa = codRecompensa;
 }
 
 function Servicos(bd){
@@ -108,11 +109,13 @@ function Servicos(bd){
     }
 }
 
-function Compra(codServico, numCartao, dataCompra, dataUtilizacao){
+function Compra(codCompra, codServico, numCartao, dataCompra, dataUtilizacao, foiUtilizado){
+    this.codCompra = codCompra;
     this.codServico = codServico;
     this.numCartao = numCartao;
     this.dataCompra = dataCompra;
     this.dataUtilizacao = dataUtilizacao;
+    this.foiUtilizado = foiUtilizado;
 }
 
 function Compras(bd){
@@ -121,8 +124,8 @@ function Compras(bd){
     this.compraServico = async function(codServico, numCartao){
         const conexao = await this.bd.getConexao();
 
-        const sqlInsert = "INSERT INTO COMPRAS (COD_SERVICO, NUM_CARTAO, DATA_COMPRA) "
-                            + "VALUES (:codServico, :numCartao, SYSDATE)";
+        const sqlInsert = "INSERT INTO COMPRAS (COD_COMPRA, COD_SERVICO, NUM_CARTAO, DATA_COMPRA, DATA_UTILIZACAO, FOI_UTILIZADO) "
+                            + "VALUES (SEQ_COMPRAS.NEXTVAL, :codServico, :numCartao, SYSDATE, null, 0)";
 
         const dados = {codServico: codServico, numCartao: numCartao};
         console.log(sqlInsert, dados);
@@ -131,15 +134,73 @@ function Compras(bd){
         console.log(result);
     }
 
+    this.getAllCompras = async function(){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectAll = "SELECT * FROM COMPRAS";
+
+        ret = await conexao.execute(sqlSelectAll);
+
+        return ret.rows;
+    }
+
     this.getAllComprasNaoUtilizadas = async function(numCartao){
         const conexao = await this.bd.getConexao(); 
 
-        const sqlSelectAll = "SELECT * FROM COMPRAS WHERE NUM_CARTAO = :numCartao AND DATA_UTILIZACAO = NULL";
+        const sqlSelectAll = "SELECT * FROM COMPRAS WHERE NUM_CARTAO = :numCartao AND FOI_UTILIZADO = 0";
         const dados = {numCartao: numCartao};
         
         ret = await conexao.execute(sqlSelectAll, dados);
 
         return ret.rows;
+    }
+    
+    this.getAllComprasByNumCartao = async function(numCartao){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectByNum = "SELECT * FROM COMPRAS WHERE NUM_CARTAO = :numCartao";
+        const dados = {numCartao: numCartao};
+        
+        ret = await conexao.execute(sqlSelectByNum, dados);
+        console.log(ret);
+
+        return ret.rows;
+    }
+
+    this.utilizaCompra = async function(codCompra, numCartao){
+        const conexao = await this.bd.getConexao();
+
+        const sqlUpdate = "UPDATE COMPRAS SET DATA_UTILIZACAO = SYSDATE, FOI_UTILIZADO = 1"
+                            + "WHERE COD_COMPRA = :codCompra AND NUM_CARTAO = :numCartao";
+        const dados = {codCompra: codCompra, numCartao: numCartao};
+
+        ret = await conexao.execute(sqlUpdate, dados, {autoCommit: true});
+        console.log(ret);
+
+        return ret;
+    }
+}
+
+function Recompensa(codRecompensa, foiObtido, dataRecebimento, dataRealizacao){
+    this.codRecompensa = codRecompensa;
+    this.foiObtido = foiObtido;
+    this.dataRecebimento = dataRecebimento;
+    this.dataRealizacao = dataRealizacao;
+}
+
+function Recompensas(bd){
+    this.bd = bd;
+
+    this.criarRecompensa = async function(){
+        const conexao = await this.bd.getConexao();
+
+        sqlInsert = "INSERT INTO RECOMPENSAS (COD_RECOMPENSA, FOI_OBTIDO, DATA_REALIZACAO, DATA_RECEBIMENTO)"
+                        + " VALUES (SEQ_RECOMPENSA.NEXTVAL, 0, null, SYSDATE)";
+        
+        const result = await conexao.execute(sqlInsert, {autoCommit: true});
+        console.log(result);
+
+        return result;
     }
 }
 
@@ -284,7 +345,7 @@ async function getAllServicos(req, res){
     else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Servico(get[i][0], get[i][1], get[i][2]));
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3]));
 
         console.log(ret);
         return res.status(200).json(ret);
@@ -308,6 +369,27 @@ async function compraServico(req, res){
     }   
 }
 
+async function getAllCompras(req, res){
+    let get;
+
+    try{
+        get = await global.compras.getAllCompras();
+        console.log(get);
+    } catch(err){}
+
+    if(get.length == 0){
+        return res.status(404).json([]);
+    } else {
+        const ret = [];
+        
+        for(i=0;i<get.length;i++)
+            ret.push(new Compra(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5]));
+
+        console.log(ret);
+        return res.status(200).json(ret);
+    }
+}
+
 async function getAllComprasNaoUtilizadas(req, res){
     if(req.body.numCartao)
         return res.status(422).json();
@@ -316,7 +398,7 @@ async function getAllComprasNaoUtilizadas(req, res){
     const numCartao = req.params.numCartao;
 
     try{
-        get = await global.servicos.getAllComprasNaoUtilizadas(numCartao);
+        get = await global.compras.getAllComprasNaoUtilizadas(numCartao);
     }catch(err){}
 
     if(get.length == 0){
@@ -324,19 +406,70 @@ async function getAllComprasNaoUtilizadas(req, res){
     } else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Servico(get[i][0], get[i][1], get[i][2]));
+            ret.push(new Compra(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5]));
 
         console.log(ret);
         return res.status(200).json(ret);    
     }
 }
 
+async function getAllComprasByNumCartao(req, res){
+    if(req.body.numCartao)
+        return res.status(422).json();
+
+    const numCartao = req.params.numCartao; 
+    let get;
+
+    try{
+        get = await global.compras.getAllComprasByNumCartao(numCartao);
+    } catch(err){}
+
+    if(get.length == 0){
+        return res.status(404).json([]);
+    } else {
+        const ret = [];
+        for(i=0;i<get.length;i++)
+            ret.push(new Compra(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5]));
+
+        console.log(ret);
+        return res.status(200).json(ret);    
+    }
+}
+
+async function utilizaCompra(req, res){
+    if(req.body.numCartao || req.body.codCompra || req.body.codServico)
+        return res.status(422).json();
+
+    const numCartao = req.params.numCartao;
+    const codCompra = req.params.codCompra;
+
+    try{
+        ret = await global.compras.utilizaCompra(codCompra, numCartao);
+        return res.status(201).json({"codCompra": ret.codCompra, "codServico": ret.codServico, "numCartao": ret.numCartao})
+    }
+    catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }   
+}
+
+async function criarRecompensa(req, res){
+    
+    try{
+        ret = await global.recompensas.criarRecompensa();
+        return res.status(201).json({"codRecompensa": ret.codRecompensa});
+    } catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }
+}
 async function ligarServidor()
 {
     const bd = new BD();
     global.servicos = new Servicos(bd);
     global.cartoes = new Cartoes (bd);
     global.compras = new Compras(bd);
+    global.recompensas = new Recompensas(bd);
 
     const express = require('express');
     const cors = require('cors');
@@ -355,8 +488,12 @@ async function ligarServidor()
     app.get('/servicos/:codServico', getOneServiceByCode);
 
     app.post('/compras/:codServico/:numCartao', compraServico);
-    app.get('/compras/:numCartao', getAllComprasNaoUtilizadas);
+    app.get('/compras', getAllCompras);
+    app.get('/compras/utiliza/:numCartao', getAllComprasNaoUtilizadas);
+    app.get('/compras/:numCartao', getAllComprasByNumCartao);
+    app.put('/compras/:codCompra/:numCartao', utilizaCompra);
     
+    app.post('/recompensas', criarRecompensa);
     app.listen(3000, () => {
         console.log('App is running on port 3000');
     });
