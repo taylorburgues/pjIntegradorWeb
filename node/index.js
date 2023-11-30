@@ -20,10 +20,9 @@ function BD(){
     }
 }
 
-function Cartao (numCartao, createdDate, saldo){
+function Cartao (numCartao, createdDate){
     this.numCartao = numCartao;
     this.createdDate = createdDate;
-    this.saldo = saldo;
 }
 
 function Cartoes (bd){
@@ -32,9 +31,9 @@ function Cartoes (bd){
     this.criarCartao = async function (cartao){
         const conexao = await this.bd.getConexao();
 
-        const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE, SALDO)" + 
-                        "VALUES (:numCartao, sysdate, :saldo)";
-        const dados = {numCartao: cartao.numCartao, saldo: cartao.saldo};
+        const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE)" + 
+                        "VALUES (:numCartao, sysdate)";
+        const dados = {numCartao: cartao.numCartao};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
@@ -61,26 +60,12 @@ function Cartoes (bd){
         
         return ret.rows;
     }
-
-    this.alterarSaldoCartao = async function (numCartao, novoSaldo){
-        const conexao = await this.bd.getConexao();
-
-        const sqlUpdate = "UPDATE CARTOES " +
-                            "SET SALDO = :novoSaldo " + 
-                            "WHERE NUM_CARTAO = :numCartao";
-
-        const dados = {novoSaldo: novoSaldo, numCartao: numCartao};
-        const result = await conexao.execute(sqlUpdate, dados, {autoCommit: true});
-
-        console.log(result);
-    }
 } 
 
-function Servico (codServico, nome, descricao, preco){
+function Servico (codServico, nome, descricao){
     this.codServico = codServico;
     this.nome = nome;
     this.descricao = descricao;
-    this.preco = preco;
 }
 
 function Servicos(bd){
@@ -89,9 +74,9 @@ function Servicos(bd){
     this.criarServico = async function (servico){
         const conexao = await this.bd.getConexao();
         
-        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO, PRECO) " + 
-                        "VALUES (:codServico, :nome, :descricao, :preco)";
-        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao, preco: servico.preco};
+        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO) " + 
+                        "VALUES (:codServico, :nome, :descricao)";
+        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
@@ -121,33 +106,6 @@ function Servicos(bd){
         console.log(ret);
         return ret.rows;
     }
-
-    /*this.compraServico = async function(codServico, numCartao){
-        const conexao = await this.bd.getConexao();
-
-        const sqlInsert = "UPDATE SERVICOS " +
-                            "SET NUM_CARTAO = :numCartao " + 
-                            "WHERE COD_SERVICO = :codServico";
- 
-        const dados = {numCartao: numCartao, codServico: codServico};
-        console.log(sqlInsert, dados);
-        const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
-
-        console.log(result);
-    }*/
-
-    this.getAllServicesBySaldoCartao = async function(numCartao){
-        const conexao = await this.bd.getConexao();
-
-        const sqlSelectByPrice = "SELECT * FROM SERVICOS WHERE " +
-                                    "PRECO < (SELECT SALDO FROM CARTOES WHERE NUM_CARTAO = :numCartao)";
-
-        const dados = {numCartao: numCartao};
-        ret = await conexao.execute(sqlSelectByPrice, dados);
-
-        console.log(ret);
-        return ret.rows;
-    }
 }
 
 function Compra(codServico, numCartao, dataCompra, dataUtilizacao){
@@ -172,6 +130,17 @@ function Compras(bd){
 
         console.log(result);
     }
+
+    this.getAllComprasNaoUtilizadas = async function(numCartao){
+        const conexao = await this.bd.getConexao(); 
+
+        const sqlSelectAll = "SELECT * FROM COMPRAS WHERE NUM_CARTAO = :numCartao AND DATA_UTILIZACAO = NULL";
+        const dados = {numCartao: numCartao};
+        
+        ret = await conexao.execute(sqlSelectAll, dados);
+
+        return ret.rows;
+    }
 }
 
 function middleWareGlobal(req, res, next)
@@ -193,9 +162,8 @@ async function criarCartao(req, res){
     }
 
     const numCartao = req.body.numCartao;
-    const saldoPadrao = 2000;
 
-    const cartao = new Cartao(numCartao, req.body.createdDate, saldoPadrao);
+    const cartao = new Cartao(numCartao, req.body.createdDate);
 
     try{
         await global.cartoes.criarCartao(cartao);
@@ -208,7 +176,7 @@ async function criarCartao(req, res){
 }
 
 async function getAllCartoes(req, res){
-    if(req.body.numCartao || req.body.createdDate || req.body.saldo)
+    if(req.body.numCartao || req.body.createdDate)
         return res.status(422).json();
 
     let get;
@@ -227,7 +195,7 @@ async function getAllCartoes(req, res){
     else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Cartao(get[i][0], get[i][1], get[i][2]));
+            ret.push(new Cartao(get[i][0], get[i][1]));
 
         return res.status(200).json(ret);
     }
@@ -252,28 +220,10 @@ async function getOneCartaoByNum(req, res){
     else {
         card = ret[0];
         console.log(card);
-        card = new Cartao(card[0], card[1], card[2]);
+        card = new Cartao(card[0], card[1]);
         console.log(card);
         return res.status(200).json(card);
     }
-}
-
-async function alterarSaldoCartao(req, res){
-    if(!req.body.novoSaldo)
-        return res.status(422).json();
-
-    const numCartao = req.params.numCartao;
-
-    let put;
-    try{
-        put = await global.cartoes.alterarSaldoCartao(numCartao, req.body.novoSaldo);
-        console.log(put);
-        return res.status(201).json();
-    }
-    catch(exception){
-        console.error(exception);
-    }
-
 }
 
 async function getOneServiceByCode(req, res){
@@ -295,7 +245,7 @@ async function getOneServiceByCode(req, res){
     }
     else {
         servico = ret[0];
-        servico = new Servico(servico[0], servico[1], servico[2], servico[3], servico[4]);
+        servico = new Servico(servico[0], servico[1], servico[2], servico[3]);
         return res.status(200).json(servico);
     }
 }
@@ -305,7 +255,7 @@ async function criarServico(req, res){
         return res.status(422).json();
     }
 
-    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, null, req.body.preco);
+    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, null);
 
     try{
         await global.servicos.criarServico(servico);
@@ -334,7 +284,7 @@ async function getAllServicos(req, res){
     else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Servico(get[i][0], get[i][1], get[i][2],get[i][3]));
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2]));
 
         console.log(ret);
         return res.status(200).json(ret);
@@ -358,7 +308,7 @@ async function compraServico(req, res){
     }   
 }
 
-async function getAllServicesBySaldoCartao(req, res){
+async function getAllComprasNaoUtilizadas(req, res){
     if(req.body.numCartao)
         return res.status(422).json();
 
@@ -366,7 +316,7 @@ async function getAllServicesBySaldoCartao(req, res){
     const numCartao = req.params.numCartao;
 
     try{
-        get = await global.servicos.getAllServicesBySaldoCartao(numCartao);
+        get = await global.servicos.getAllComprasNaoUtilizadas(numCartao);
     }catch(err){}
 
     if(get.length == 0){
@@ -374,7 +324,7 @@ async function getAllServicesBySaldoCartao(req, res){
     } else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Servico(get[i][0], get[i][1], get[i][2], get[i][3],get[i][4]));
+            ret.push(new Servico(get[i][0], get[i][1], get[i][2]));
 
         console.log(ret);
         return res.status(200).json(ret);    
@@ -399,14 +349,13 @@ async function ligarServidor()
     app.post('/cartoes', criarCartao);
     app.get('/cartoes', getAllCartoes);
     app.get('/cartoes/:numCartao', getOneCartaoByNum);
-    app.put('/cartoes/:numCartao/saldo', alterarSaldoCartao);
 
     app.post('/servicos', criarServico);
     app.get('/servicos', getAllServicos);
     app.get('/servicos/:codServico', getOneServiceByCode);
-    app.get('/servicos/cartoes/:numCartao', getAllServicesBySaldoCartao);
 
     app.post('/compras/:codServico/:numCartao', compraServico);
+    app.get('/compras/:numCartao', getAllComprasNaoUtilizadas);
     
     app.listen(3000, () => {
         console.log('App is running on port 3000');
