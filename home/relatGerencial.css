@@ -1,0 +1,12 @@
+*{
+    font-family: Gotham;
+}
+body{
+    background-image: url(../images/elipses.png);
+    background-size: 100%;
+    border: none;
+	overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+}
