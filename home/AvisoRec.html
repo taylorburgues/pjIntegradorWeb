@@ -35,10 +35,9 @@
 
         console.log(cartao);
 
-        document.getElementById("lblSaldo").textContent += cartao.saldo;
 
         let get;
-        get = await findAllServicesBuyable(numCartao);
+        get = await findAllComprasNaoUtilizadasByNumCartao(numCartao);
 
         console.log(get);
         
@@ -47,22 +46,23 @@
         for(i=0;i<get.length;i++){
             var divNova = document.createElement("div");    
 
+            divNova.appendChild(document.createTextNode("Código da Compra:" + get[i].codPreco + "   "));
             divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
             divNova.appendChild(document.createTextNode("Nome do serviço: " + get[i].nome+ "   "));
             divNova.appendChild(document.createTextNode("Descrição do serviço: " + get[i].descricao+ "   "));
-            divNova.appendChild(document.createTextNode("Preço do serviço: " + get[i].preco+ "   "));
+            divNova.appendChild(document.createTextNode("Código da recompensa: " + get[i].codRecompensa+ "   "));
 
             form.appendChild(divNova);
         }   
     }
 
-    async function findAllServicesBuyable(numCartao){
-        const url = "http://localhost:3000/servicos/cartoes/" + numCartao;
+    async function findAllComprasNaoUtilizadasByNumCartao(numCartao){
+        const url = "http://localhost:3000/compras/utiliza" + numCartao;
         const response = await fetch(url);
 
-        let servicosDisponiveis = response.json();
+        let compras = response.json();
 
-        return servicosDisponiveis;
+        return compras;
     }
 </script>
 </body>

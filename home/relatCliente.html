@@ -9,11 +9,56 @@
 <body>
     <a class="btnvoltar" href="BtnRelatorio.html"> Voltar </a>
     <div>
-        <a class="btn" onclick="createAllServiceElements()">Pesquisar</a>
+        <a class="btn" onclick="createAllShoppingElements()">Pesquisar</a>
         <form class="search-container">
-            <input type="text" id="search-bar" placeholder="Digite sua senha:">
+            <input type="text" id="search-bar" placeholder="Digite seu número de cartão:">
             <a href="#"></a>
         </form>
     </div>
+    <div>
+        <form id="services">
+        </form>
+    </div>
+    <script>
+
+        async function showAllComprasCliente(numCartao){
+            const url = "http://localhost:3000/compras/" + numCartao;
+
+            const response = await fetch(url);
+
+            const result = await response.json();
+            console.log(result);
+
+            return result;
+        }
+        
+        async function createAllShoppingElements(){
+            const numCartao = document.getElementById("search-bar").value;
+            console.log(numCartao);
+
+            let get;
+            get = await showAllComprasCliente(numCartao);
+
+            var form = document.getElementById("services");
+
+            for(i=0;i<get.length;i++){
+                var divNova = document.createElement("div");    
+                
+                let utilizado;
+                if(get[i].foiUtilizado == 0)
+                    utilizado = "N";
+                else
+                    utilizado = "S";
+
+                divNova.appendChild(document.createTextNode("Código da compra: " + get[i].codCompra + "   "));
+                divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
+                divNova.appendChild(document.createTextNode("Data da compra: " + get[i].dataCompra+ "   "));
+                divNova.appendChild(document.createTextNode("Data de utilização: " + get[i].dataUtilizacao+ "   "));
+                divNova.appendChild(document.createTextNode("Utilizado: " + utilizado));
+
+                form.appendChild(divNova);
+            }
+        }
+    </script>
 </body>
 </html>

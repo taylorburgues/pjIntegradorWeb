@@ -6,8 +6,46 @@
     <link rel="stylesheet" href="relatGerencial.css">
     <title>Document</title>
 </head>
-<body>
+<body onload="createAllManagerElements()">
     <a class="btnvoltar" href="BtnRelatorio.html"> Voltar </a>
-    
+    <div>
+        <form id="services">
+        </form>
+    </div>
+    <script>
+
+        async function showAllComprasGerente(){
+            const url = "http://localhost:3000/compras";
+
+            const response = await fetch(url);
+            const result = response.json();
+            return result;
+        }
+
+        async function createAllManagerElements(){
+            let get;
+            get = await showAllComprasGerente();
+
+            var form = document.getElementById("services");
+
+            for(i=0;i<get.length;i++){
+                var divNova = document.createElement("div");    
+                
+                let utilizado;
+                if(get[i].foiUtilizado == 0)
+                    utilizado = "N";
+                else
+                    utilizado = "S";
+
+                divNova.appendChild(document.createTextNode("Código da compra: " + get[i].codCompra + "   "));
+                divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
+                divNova.appendChild(document.createTextNode("Data da compra: " + get[i].dataCompra+ "   "));
+                divNova.appendChild(document.createTextNode("Data de utilização: " + get[i].dataUtilizacao+ "   "));
+                divNova.appendChild(document.createTextNode("Utilizado: " + utilizado));
+
+                form.appendChild(divNova);
+            }
+        }
+    </script>
 </body>
 </html>
