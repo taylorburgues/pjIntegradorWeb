@@ -10,3 +10,66 @@ body{
     flex-direction: column;
 
 }
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px 100px;
+    max-width: 1200px;
+    width: 100%;
+    gap: 200px;
+}
+  
+  
+.btn { 
+    display: block;
+    padding: 80px 3px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px #595959;
+    max-width: 280px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin-top: 180px;
+}
+  
+.button1:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.button2:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+.btnvoltar{
+    display: inline-block;
+    left: 20px;
+    top: 20px;
+    padding: 10px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 40px;
+    position: fixed;
+}
+
+.btnvoltar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}

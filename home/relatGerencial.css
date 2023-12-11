@@ -10,3 +10,25 @@ body{
     flex-direction: column;
 
 }
+
+.btnvoltar{
+    display: inline-block;
+    left: 20px;
+    top: 20px;
+    padding: 10px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 40px;
+    position: fixed;
+}
+
+.btnvoltar:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
