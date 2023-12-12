@@ -76,9 +76,9 @@ function Servicos(bd){
     this.criarServico = async function (servico){
         const conexao = await this.bd.getConexao();
         
-        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO) " + 
-                        "VALUES (:codServico, :nome, :descricao)";
-        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao};
+        const sqlInsert = "INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO, COD_RECOMPENSA) " + 
+                        "VALUES (:codServico, :nome, :descricao, :codRecompensa)";
+        const dados = {codServico: servico.codServico, nome: servico.nome, descricao: servico.descricao, codRecompensa: servico.codRecompensa};
         console.log(sqlInsert, dados);
         const result = await conexao.execute(sqlInsert, dados, {autoCommit: true});
         
@@ -156,6 +156,7 @@ function Compras(bd){
         
         ret = await conexao.execute(sqlSelectAll, dados);
 
+        console.log(ret);
         return ret.rows;
     }
     
@@ -182,6 +183,20 @@ function Compras(bd){
         console.log(result);
 
         return result;
+    }
+
+    this.getOneCompraByCodCompra = async function(codCompra){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectOne = "SELECT c.cod_compra, s.cod_servico, s.nome, s.descricao, s.cod_recompensa FROM Compras c"
+                            + " JOIN SERVICOS s on c.cod_servico = s.cod_servico"
+                            + " AND c.cod_compra = :codCompra";
+        
+        const dados = {codCompra: codCompra};
+
+        ret = await conexao.execute(sqlSelectOne, dados);
+
+        return ret.rows;
     }
 }
 
@@ -229,6 +244,14 @@ function middleWareGlobal(req, res, next)
     console.log('Finalizou');
 
     console.timeEnd('Requisição');
+}
+
+function Utilizacao(codCompra, codServico, nomeServico, descricaoServico, codRecompensa){
+    this.codCompra = codCompra;
+    this.codServico = codServico;
+    this.nomeServico = nomeServico;
+    this.descricaoServico = descricaoServico;
+    this.codRecompensa = codRecompensa;
 }
 
 async function criarCartao(req, res){
@@ -331,7 +354,7 @@ async function criarServico(req, res){
         return res.status(422).json();
     }
 
-    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, null);
+    const servico = new Servico(req.body.codServico, req.body.nome, req.body.descricao, req.body.codRecompensa);
 
     try{
         await global.servicos.criarServico(servico);
@@ -404,7 +427,7 @@ async function getAllComprasNaoUtilizadas(req, res){
     } else{
         const ret = [];
         for(i=0;i<get.length;i++)
-            ret.push(new Compra(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5]));
+            ret.push(new Utilizacao(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4]));
 
         console.log(ret);
         return res.status(200).json(ret);    
@@ -434,6 +457,25 @@ async function getAllComprasByNumCartao(req, res){
     }
 }
 
+async function getOneCompraByCodCompra(req, res){
+    if(req.body.codCompra)
+        return res.status(422).json();
+
+    const codCompra = req.params.codCompra;
+    let get;
+
+    try{
+        get = await global.compras.getOneCompraByCodCompra(codCompra);
+    } catch(err){}
+    if(get.length == 0){
+        return res.status(404).json([]);
+    } else {
+        compra = get[0];
+        compra = new Utilizacao(compra[0], compra[1], compra[2], compra[3], compra[4]); 
+        console.log(compra);
+        return res.status(200).json(compra);    
+    }
+}
 
 async function compraServico(req, res){
     if(req.body.codServico || req.body.numCartao)
@@ -466,21 +508,21 @@ async function utilizaServico(req, res){
     if(req.params.codServico)
         return res.status(422).json();
 
-    const codServico = req.body.codServico;
-    const servico = new Servico(codServico, req.body.nome, req.body.descricao, req.body.codRecompensa);
+    const codRecompensa = req.body.codRecompensa;
+    const codCompra = req.body.codCompra;
+    const numCartao = req.body.numCartao; 
 
-    const codRecompensa = servico.codRecompensa;
-    const numCartao = req.params.numCartao; 
+    console.log(codRecompensa);
+    console.log(codCompra);
+    console.log(numCartao);
 
     try{
         if(codRecompensa != null){
             await global.recompensas.utilizaRecompensa(codRecompensa);
-            await global.compras.compraServico(codServico, numCartao);
-            return res.status(200).json();
-        } else {
-            await global.compras.utilizaCompra(servico.codServico, numCartao);
-            return res.status(200).json();
+            console.log("Utilizou recompensa");
         }
+        await global.compras.utilizaCompra(codCompra, numCartao);
+        return res.status(200).json();
     } catch(err){
         console.error(err);
         return req.status(409).json();
@@ -511,6 +553,7 @@ async function ligarServidor()
     app.get('/servicos', getAllServicos);
     app.get('/servicos/:codServico', getOneServiceByCode);
 
+    app.get('/compras/:codCompra', getOneCompraByCodCompra);
     app.post('/compras/:codServico/:numCartao', compraServico);
     app.get('/compras', getAllCompras);
     app.get('/compras/utiliza/:numCartao', getAllComprasNaoUtilizadas);

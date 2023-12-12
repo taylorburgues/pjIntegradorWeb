@@ -12,10 +12,14 @@
     <div>
         <a class="btn" onclick="createAllServiceElements()">Pesquisar</a>
         <form class="search-container">
-            <input type="text" id="search-bar" placeholder="Digite sua senha:">
+            <input type="text" id="search-bar" placeholder="Digite o número do cartão:">
             <a href="#"></a>
         </form>
-        <a id="lblSaldo"> O saldo atual do cartão é de: </a>
+        <form class="search-container">
+            <input type="text" id="search-bar-compra" placeholder="Digite o código da compra:">
+            <a href="#"></a>
+        </form>
+        <a class="btnUtiliza" onclick="utilizaServico()">Utilizar Serviço</a>
     </div>
 
     <div>
@@ -24,9 +28,9 @@
     </div>
     
 <script>
-
+    const numCartao = document.getElementById("search-bar").value;
+    
     async function createAllServiceElements(){
-        const numCartao = document.getElementById("search-bar").value;
         console.log(numCartao);
 
         const url = "http://localhost:3000/cartoes/" + numCartao;
@@ -34,7 +38,6 @@
         const cartao = await response.json();
 
         console.log(cartao);
-
 
         let get;
         get = await findAllComprasNaoUtilizadasByNumCartao(numCartao);
@@ -48,8 +51,8 @@
 
             divNova.appendChild(document.createTextNode("Código da Compra:" + get[i].codCompra + "   "));
             divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
-            divNova.appendChild(document.createTextNode("Nome do serviço: " + get[i].nome+ "   "));
-            divNova.appendChild(document.createTextNode("Descrição do serviço: " + get[i].descricao+ "   "));
+            divNova.appendChild(document.createTextNode("Nome do serviço: " + get[i].nomeServico+ "   "));
+            divNova.appendChild(document.createTextNode("Descrição do serviço: " + get[i].descricaoServico+ "   "));
             divNova.appendChild(document.createTextNode("Código da recompensa: " + get[i].codRecompensa+ "   "));
 
             form.appendChild(divNova);
@@ -57,12 +60,41 @@
     }
 
     async function findAllComprasNaoUtilizadasByNumCartao(numCartao){
-        const url = "http://localhost:3000/compras/utiliza" + numCartao;
+        const url = "http://localhost:3000/compras/utiliza/" + numCartao;
         const response = await fetch(url);
 
         let compras = response.json();
 
         return compras;
+    }
+
+    async function utilizaServico(){
+        const compra = await findOneCompraByCodCompra();
+
+        const body = {codCompra: codCompra, numCartao: numCartao, codRecompensa: compra.codRecompensa};
+
+        const response = await fetch("http://localhost:3000/utiliza/" + numCartao, {
+                method: "PUT", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+        
+        
+        const result = await response.json();
+        console.log(result);
+    }
+
+    async function findOneCompraByCodCompra(){
+        const codCompra = document.getElementById("search-bar-compra").value;
+
+        const url = "http://localhost:3000/compras/" + codCompra;
+        const response = await fetch(url);
+
+        const compra = response.json();
+
+        return compra;
     }
 </script>
 </body>

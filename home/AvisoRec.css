@@ -59,6 +59,24 @@ input#search-barr {
     position: fixed;
 }
 
+.btnUtiliza{
+    display: inline-block;
+    margin-left: 1000px;
+    top: 150px;
+    padding: 10px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #707070;
+    border: none;
+    border-radius: 40px;
+    position: fixed;
+}
+
+
 .btnvoltar{
     display: inline-block;
     left: 20px;
