@@ -17,13 +17,37 @@
     </div>
     <div>
         <form id="services">
+            <h3><a> Serviços </a> </h3> <br>
         </form>
+        <form id="recompensas">
+            <h3><a> Recompensas </a></h3><br>
+        </form>
+        <h3><a id="saldo"> Saldo de serviços e recompensas não utilizadas: </a></h3><br>
     </div>
     <script>
+        async function createAllShoppingElements(){
+            const numCartao = document.getElementById("search-bar").value;
+            console.log(numCartao);
+
+            let getCompras, getServicoRecompensas;
+            getCompras = await showAllComprasCliente(numCartao);
+            getServicoRecompensas = await showAllServicoRecompensasCliente(numCartao);
+
+            for(i=0;i<getCompras.length;i++){
+                createElementsCompra(getCompras[i], "div-compras", "services");
+            }
+            for(i=0;i<getServicoRecompensas.length;i++){
+                createElementsServicoRecompensas(getServicoRecompensas[i], "div-recompensas", "recompensas");
+            }
+            
+            const saldoNaoUtilizadas = await showSaldoComprasNaoUtilizadas(numCartao);
+            document.getElementById("saldo").textContent += saldoNaoUtilizadas;
+        }
 
         async function showAllComprasCliente(numCartao){
-            const url = "http://localhost:3000/compras/" + numCartao;
+            const url = "http://localhost:3000/compras/cartoes/" + numCartao;
 
+            console.log(url);
             const response = await fetch(url);
 
             const result = await response.json();
@@ -31,33 +55,98 @@
 
             return result;
         }
-        
-        async function createAllShoppingElements(){
-            const numCartao = document.getElementById("search-bar").value;
-            console.log(numCartao);
 
-            let get;
-            get = await showAllComprasCliente(numCartao);
+        async function showAllServicoRecompensasCliente(numCartao){
+            const url = "http://localhost:3000/servicos/recompensas/" + numCartao;
 
-            var form = document.getElementById("services");
+            const response = await fetch(url);
+            const result = await response.json();
 
-            for(i=0;i<get.length;i++){
-                var divNova = document.createElement("div");    
-                
-                let utilizado;
-                if(get[i].foiUtilizado == 0)
-                    utilizado = "N";
-                else
-                    utilizado = "S";
+            return result;
+        }
 
-                divNova.appendChild(document.createTextNode("Código da compra: " + get[i].codCompra + "   "));
-                divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
-                divNova.appendChild(document.createTextNode("Data da compra: " + get[i].dataCompra+ "   "));
-                divNova.appendChild(document.createTextNode("Data de utilização: " + get[i].dataUtilizacao+ "   "));
-                divNova.appendChild(document.createTextNode("Utilizado: " + utilizado));
+        async function showSaldoComprasNaoUtilizadas(numCartao){
+            const url = "http://localhost:3000/compras/utiliza/" + numCartao;
 
-                form.appendChild(divNova);
-            }
+            const response = await fetch(url);
+            const result = await response.json();
+
+            return result.length;
+        }
+        function createElementsCompra(compra, nomeDiv, nomeForm){
+            var form = document.getElementById(nomeForm);
+
+            var divNova = document.createElement(nomeDiv);    
+            
+            const formatoData = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            };
+
+            const dataCompra = new Date(compra.dataCompra);
+            const dataCompraFormatada = dataCompra.toLocaleString('pt-BR', formatoData);
+
+            let utilizado;
+            if(compra.foiUtilizado == 0)
+                utilizado = "N";
+            else
+                utilizado = "S";
+
+            let dataUtilizacaoFormatada; 
+            if(compra.dataUtilizacao != null){
+                const dataUtilizacao = new Date(compra.dataUtilizacao);
+                dataUtilizacaoFormatada = dataUtilizacao.toLocaleString('pt-BR', formatoData);
+            } else
+                dataUtilizacaoFormatada = '-';
+
+            divNova.appendChild(document.createTextNode("\nCódigo da compra: " + compra.codCompra + "  |  "));
+            divNova.appendChild(document.createTextNode("Código do serviço: " + compra.codServico + "  |  "));
+            divNova.appendChild(document.createTextNode("Data da compra: " + dataCompraFormatada+ "  |  "));
+            divNova.appendChild(document.createTextNode("Data de utilização: " + dataUtilizacaoFormatada+ "  |  "));
+            divNova.appendChild(document.createTextNode("Utilizado: " + utilizado));
+
+            divNova.appendChild(document.createElement("br"));
+            form.appendChild(divNova);
+        }
+
+        function createElementsServicoRecompensas(servicoRecompensa, nomeDiv, nomeForm){
+            var form = document.getElementById(nomeForm);
+
+            var divNova = document.createElement(nomeDiv);    
+            
+            let utilizado;
+            if(servicoRecompensa.foiObtido == 0)
+                utilizado = "N";
+            else
+                utilizado = "S";
+
+            const formatoData = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            };
+
+            const dataRecebimento = new Date(servicoRecompensa.dataRecebimento);
+            const dataRecebimentoFormatada = dataRecebimento.toLocaleString('pt-BR', formatoData);
+            
+            let dataRealizacaoFormatada; 
+            if(servicoRecompensa.dataRealizacao != null){
+                const dataRealizacao = new Date(servicoRecompensa.dataRealizacao);
+                dataRealizacaoFormatada = dataRealizacao.toLocaleString('pt-BR', formatoData);
+            } else
+                dataRealizacaoFormatada = '-';
+            
+            divNova.appendChild(document.createTextNode("Código do serviço: " + servicoRecompensa.codServico + "  |  "));
+            divNova.appendChild(document.createTextNode("Nome do serviço: " + servicoRecompensa.nomeServico + "  |  "));
+            divNova.appendChild(document.createTextNode("Descrição do serviço: " + servicoRecompensa.descServico+ "  |  "));
+            divNova.appendChild(document.createTextNode("Data da recebimento: " + dataRecebimentoFormatada+ "  |  "));
+            divNova.appendChild(document.createTextNode("Data de realização: " + dataRealizacaoFormatada + "  |  "));
+            divNova.appendChild(document.createTextNode("Utilizado: " + utilizado + "  |  "));
+            
+            divNova.appendChild(document.createElement("br"));
+
+            form.appendChild(divNova);
         }
     </script>
 </body>

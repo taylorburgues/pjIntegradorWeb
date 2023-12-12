@@ -28,9 +28,9 @@
     </div>
     
 <script>
-    const numCartao = document.getElementById("search-bar").value;
     
     async function createAllServiceElements(){
+        const numCartao = document.getElementById("search-bar").value;
         console.log(numCartao);
 
         const url = "http://localhost:3000/cartoes/" + numCartao;
@@ -69,6 +69,8 @@
     }
 
     async function utilizaServico(){
+        const numCartao = document.getElementById("search-bar").value;
+        const codCompra = document.getElementById("search-bar-compra").value;
         const compra = await findOneCompraByCodCompra();
 
         const body = {codCompra: codCompra, numCartao: numCartao, codRecompensa: compra.codRecompensa};
