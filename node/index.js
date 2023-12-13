@@ -164,7 +164,10 @@ function Compras(bd){
     this.getAllComprasByNumCartao = async function(numCartao){
         const conexao = await this.bd.getConexao();
 
-        const sqlSelectByNum = "SELECT * FROM COMPRAS WHERE NUM_CARTAO = :numCartao";
+        const sqlSelectByNum = "SELECT c.* FROM COMPRAS c"  +
+                                " JOIN SERVICOS s on c.cod_servico = s.cod_servico" +
+                                " WHERE s.cod_recompensa IS NULL"+ 
+                                " AND c.num_cartao = :numCartao";
         const dados = {numCartao: numCartao};
         
         ret = await conexao.execute(sqlSelectByNum, dados);
@@ -273,14 +276,14 @@ function Recompensas(bd){
 function ServicoRecompensas(bd){
     this.bd = bd;
 
-    this.getAllServicosRecompensasRealizadas = async function(numCartao){
+    this.getAllServicosRecompensasRealizadasByNumCartao = async function(numCartao){
         const conexao = await this.bd.getConexao();
 
-        sqlSelect = "SELECT s.cod_servico, s.nome, s.descricao, r.foi_obtido, r.data_recebimento, r.data_realizacao, r.cod_recompensa FROM SERVICOS s" + 
+        sqlSelect = "SELECT s.cod_servico, s.nome, s.descricao, c.foi_utilizado, c.data_compra, c.data_utilizacao, r.cod_recompensa FROM SERVICOS s" + 
         " JOIN RECOMPENSAS r on s.cod_recompensa = r.cod_recompensa" + 
         " JOIN COMPRAS c on s.cod_servico = c.cod_servico" +
         " JOIN CARTOES ca on c.num_cartao = ca.num_cartao" +
-        " WHERE ca.num_cartao = :numCartao AND r.foi_obtido = 1";
+        " WHERE ca.num_cartao = :numCartao AND c.foi_utilizado = 1";
 
         const dados = {numCartao: numCartao};
         const ret = await conexao.execute(sqlSelect, dados);
@@ -296,6 +299,22 @@ function ServicoRecompensas(bd){
         
         console.log(sqlSelectAll);
         const ret = await conexao.execute(sqlSelectAll);
+        return ret.rows;
+    }
+
+    this.getAllServicosRecompensasByNumCartao = async function(numCartao){
+        console.log("getAllServicosRecompensasByNumCartao");
+        const conexao = await this.bd.getConexao();
+
+        const SqlSelectAll = "SELECT s.cod_servico, s.nome, s.descricao, c.foi_utilizado, c.data_compra, c.data_utilizacao, r.cod_recompensa FROM SERVICOS s" +
+        " JOIN RECOMPENSAS r on s.cod_recompensa = r.cod_recompensa" +
+        " JOIN COMPRAS c on s.cod_servico = c.cod_servico" +
+        " JOIN CARTOES ca on c.num_cartao = ca.num_cartao"+
+        " WHERE ca.num_cartao = :numCartao";
+
+        const dados = {numCartao: numCartao};
+        const ret = await conexao.execute(SqlSelectAll,dados);
+
         return ret.rows;
     }
 }
@@ -651,7 +670,7 @@ async function utilizaServico(req, res){
     }
 }
 
-async function getAllServicosRecompensasRealizadas(req, res){
+async function getAllServicosRecompensasRealizadasByNumCartao(req, res){
     if(req.body.numCartao)
         return res.status(422).json();
 
@@ -659,12 +678,36 @@ async function getAllServicosRecompensasRealizadas(req, res){
     let get;
 
     try{
-        get = await global.servicoRecompensas.getAllServicosRecompensasRealizadas(numCartao);     
+        get = await global.servicoRecompensas.getAllServicosRecompensasRealizadasByNumCartao(numCartao);     
         console.log("get"+ get);   
     } catch(err){}
 
     if(get.length == 0)
         return res.status(404).json(["Nenhum Servico Recompensa realizado"]);
+    else {
+        const ret = [];
+        for(i=0;i<get.length;i++)
+            ret.push(new ServicoRecompensa(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5], get[i][6]));
+
+        console.log(ret);
+        return res.status(200).json(ret); 
+    }
+}
+async function getAllServicosRecompensasByNumCartao(req, res){
+    if(req.body.numCartao)
+        return res.status(422).json();
+
+    const numCartao = req.params.numCartao;
+    let get;
+
+    console.log(numCartao);
+    try{
+        get = await global.servicoRecompensas.getAllServicosRecompensasByNumCartao(numCartao);     
+        console.log("get"+ get);   
+    } catch(err){}
+
+    if(get.length == 0)
+        return res.status(404).json(["Nenhum Servico Recompensa para o cartão"]);
     else {
         const ret = [];
         for(i=0;i<get.length;i++)
@@ -736,7 +779,8 @@ async function ligarServidor()
     app.put('/utiliza/:numCartao', utilizaServico);
 
     app.get('/recompensas/servicos', getAllServicosRecompensas);
-    app.get('/servicos/recompensas/:numCartao', getAllServicosRecompensasRealizadas);
+    app.get('/servicos/recompensas/:numCartao', getAllServicosRecompensasRealizadasByNumCartao);
+    app.get('/servicos/recompensas/all/:numCartao', getAllServicosRecompensasByNumCartao);
 
     app.listen(3000, () => {
         console.log('App is running on port 3000');

@@ -39,8 +39,16 @@
             for(i=0;i<getCompras.length;i++)
                 createElementsCompra(getCompras[i], "div-compras", "services");
             
-            for(i=0;i<getServicoRecompensas.length;i++)
-                createElementsServicoRecompensas(getServicoRecompensas[i], "div-recompensas", "recompensas");
+            if(getServicoRecompensas.length > 0)
+                for(i=0;i<getServicoRecompensas.length;i++)
+                    createElementsServicoRecompensas(getServicoRecompensas[i], "div-recompensas", "recompensas");
+            else{              
+                var form = document.getElementById("recompensas");
+                var divNova = document.createElement("div-sem-recompensa");
+                
+                divNova.appendChild(document.createTextNode("Não há recompensas realizadas "))
+            }
+                
             
             
             const saldoNaoUtilizadas = await showSaldoComprasNaoUtilizadas(numCartao);
@@ -60,7 +68,7 @@
         }
 
         async function showAllServicoRecompensasCliente(numCartao){
-            const url = "http://localhost:3000/servicos/recompensas/" + numCartao;
+            const url = "http://localhost:3000/servicos/recompensas/all/" + numCartao;
 
             const response = await fetch(url);
             const result = await response.json();
@@ -141,6 +149,7 @@
                 dataRealizacaoFormatada = '-';
             
             divNova.appendChild(document.createTextNode("Código do serviço: " + servicoRecompensa.codServico + "  |  "));
+            divNova.appendChild(document.createTextNode("Código da recompensa: " + servicoRecompensa.codRecompensa + "  |  "));
             divNova.appendChild(document.createTextNode("Nome do serviço: " + servicoRecompensa.nomeServico + "  |  "));
             divNova.appendChild(document.createTextNode("Descrição do serviço: " + servicoRecompensa.descServico+ "  |  "));
             divNova.appendChild(document.createTextNode("Data da recebimento: " + dataRecebimentoFormatada+ "  |  "));
