@@ -6,13 +6,18 @@ drop column saldo;
 select * from servicos;
 desc servicos;
 
-delete from servicos where cod_servico = 10;
+delete from servicos where cod_servico = 1;
 
-INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO, PRECO)
-VALUES(1, 'AS', 'AS', 2000);
+CREATE TABLE servicos(
+COD_SERVICO INTEGER PRIMARY KEY NOT NULL,
+NOME VARCHAR2(50) NOT NULL,
+DESCRICAO VARCHAR2(100) NOT NULL,
+COD_RECOMPENSA INTEGER,
+CONSTRAINT fk_codRecompensa
+FOREIGN KEY (COD_RECOMPENSA) REFERENCES RECOMPENSAS(cod_recompensa));
 
 INSERT INTO SERVICOS (COD_SERVICO, NOME, DESCRICAO, COD_RECOMPENSA)
-VALUES(12, 'AS', 'AS', 41);
+VALUES(1, 'TESTES', 'TESTES', null);
 
 update servicos
 set num_cartao = null
