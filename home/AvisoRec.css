@@ -42,6 +42,34 @@ input#search-barr {
     outline: none;
 }
 
+input#search-bar-compra {
+    margin: 0 auto;
+    width: 60%;
+    height: 45px;
+    padding: 0 20px;
+    font-size: 1rem;
+    border: 2px solid #D0CFCE;
+    border-radius: 40px;
+    outline: none;
+}
+
+input#search-barr {
+    margin: 0 auto;
+    width: 40%;
+    height: 45px;
+    padding: 0 20px;
+    font-size: 1rem;
+    border: 2px solid #D0CFCE;
+    margin-top: 40px;
+    margin-left: 300px;
+    outline: none;
+}
+
+.centro{
+    margin-left: 260px;
+}
+
+
 .btn{
     display: inline-block;
     margin-left: 800px;
@@ -61,8 +89,8 @@ input#search-barr {
 
 .btnUtiliza{
     display: inline-block;
-    margin-left: 1000px;
-    top: 150px;
+    margin-left: 800px;
+    top: 350px;
     padding: 10px 40px;
     font-size: 24px;
     cursor: pointer;
@@ -98,3 +126,15 @@ input#search-barr {
     color: #bebebe;
     background-color: #d4d4d4
 }
+
+.btn:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
+
+.btnUtiliza:hover {
+    color: #bebebe;
+    background-color: #d4d4d4
+}
+
