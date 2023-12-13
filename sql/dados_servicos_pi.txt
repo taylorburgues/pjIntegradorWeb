@@ -1,0 +1,9 @@
+1	Editor de Vídeo	Serviço para contratar um freelancer para editar seu vídeo		
+2	Designer	Serviço para contratar um designer		
+3	Roteirista	Serviço para contratar um roteirista para seu trabalho e/ou projeto		
+4	Tradutor	Contrate um serviço para traduzirem qualquer texto em qualquer idioma para você		
+5	Dublagem	Contrate alguém para dublar 10 segundos de vídeo		
+6	Criação de Logo	Contrate esse serviço para criar uma logo para sua empresa		
+7	Criação de API	Serviço para criação de uma nova API do zero, com as informações que quiser		
+8	Filmmaker	Contrate esse serviço para fazer um filme		
+9	Faxina	Contrate esse serviço para que realizem uma faxina em sua casa		
