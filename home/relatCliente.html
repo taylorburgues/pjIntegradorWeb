@@ -36,12 +36,12 @@
             getCompras = await showAllComprasCliente(numCartao);
             getServicoRecompensas = await showAllServicoRecompensasCliente(numCartao);
 
-            for(i=0;i<getCompras.length;i++){
+            for(i=0;i<getCompras.length;i++)
                 createElementsCompra(getCompras[i], "div-compras", "services");
-            }
-            for(i=0;i<getServicoRecompensas.length;i++){
+            
+            for(i=0;i<getServicoRecompensas.length;i++)
                 createElementsServicoRecompensas(getServicoRecompensas[i], "div-recompensas", "recompensas");
-            }
+            
             
             const saldoNaoUtilizadas = await showSaldoComprasNaoUtilizadas(numCartao);
             document.getElementById("saldo").textContent += saldoNaoUtilizadas;

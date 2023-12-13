@@ -27,6 +27,7 @@
         </form>
     </div>
     
+    <script src="https://randojs.com/1.0.0.js"></script>
 <script>
     
     async function createAllServiceElements(){
@@ -49,12 +50,13 @@
         for(i=0;i<get.length;i++){
             var divNova = document.createElement("div");    
 
-            divNova.appendChild(document.createTextNode("Código da Compra:" + get[i].codCompra + "   "));
-            divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
-            divNova.appendChild(document.createTextNode("Nome do serviço: " + get[i].nomeServico+ "   "));
-            divNova.appendChild(document.createTextNode("Descrição do serviço: " + get[i].descricaoServico+ "   "));
-            divNova.appendChild(document.createTextNode("Código da recompensa: " + get[i].codRecompensa+ "   "));
+            divNova.appendChild(document.createTextNode("Código da Compra: " + get[i].codCompra + "  |  "));
+            divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "  |  "));
+            divNova.appendChild(document.createTextNode("Nome do serviço: " + get[i].nomeServico+ "  |  "));
+            divNova.appendChild(document.createTextNode("Descrição do serviço: " + get[i].descricaoServico+ "  |  "));
+            divNova.appendChild(document.createTextNode("Código da recompensa: " + get[i].codRecompensa));
 
+            divNova.appendChild(document.createElement("br"));
             form.appendChild(divNova);
         }   
     }
@@ -83,9 +85,16 @@
                 body: JSON.stringify(body),
             });
         
-        
-        const result = await response.json();
-        console.log(result);
+        if(response.status == 200){
+            alert("Serviço foi utilizado!");
+            quantCompras = await getQuantComprasByNumCartao(numCartao);
+            console.log(quantCompras);
+            if(quantCompras % 2 == 0){
+                servicosRecompensas = await getAllServicosRecompensas();
+                const indexServicoAleatorio = rando(0,servicosRecompensas.length);
+                await compraServico(servicosRecompensas[indexServicoAleatorio].codServico, numCartao);
+            }
+        }
     }
 
     async function findOneCompraByCodCompra(){
@@ -94,9 +103,44 @@
         const url = "http://localhost:3000/compras/" + codCompra;
         const response = await fetch(url);
 
-        const compra = response.json();
+        const compra = await response.json();
 
         return compra;
+    }
+
+    async function getQuantComprasByNumCartao(numCartao){
+        const url = "http://localhost:3000/compras/cartoes/" + numCartao;
+        const response = await fetch(url);
+
+        const compras = await response.json();
+
+        return compras.length;
+    }
+
+    async function getAllServicosRecompensas(){
+        const url = "http://localhost:3000/recompensas/servicos/";
+        const response = await fetch(url);
+
+        const servicosRecompensas = await response.json();
+
+        return servicosRecompensas;
+    }
+
+    async function compraServico(codServico, numCartao){
+        const url = 'http://localhost:3000/compras/' + codServico + '/' + numCartao;
+                        
+        const body = {};
+
+        const response = await fetch(url, {
+                method: "POST", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+        });
+
+        if(response.status == 201)
+            alert("Você recebeu uma recompensa no cartão "+numCartao);
     }
 </script>
 </body>

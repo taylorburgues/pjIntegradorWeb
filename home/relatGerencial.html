@@ -9,7 +9,14 @@
 <body onload="createAllManagerElements()">
     <a class="btnvoltar" href="BtnRelatorio.html"> Voltar </a>
     <div>
-        <form id="services">
+        <form id="vendas">
+            <a> <h3> Vendas: </h3></a>
+        </form>
+        <br> <a id="qtdVendas"> Quantidade de vendas de serviços: </a>
+        <br> <a id="qtdRecompensasGeradas"> Quantidade de recompensas geradas: </a>
+        <br> <a id="qtdServicosNaoUtilizados"> Quantidade de serviços não utilizados: </a>
+        <form id="servicos-tipo">
+            <br><a> <h3> Serviços realizados por tipo: </h3></a>
         </form>
     </div>
     <script>
@@ -25,26 +32,104 @@
         async function createAllManagerElements(){
             let get;
             get = await showAllComprasGerente();
+            qtdVendas = get.length;
 
-            var form = document.getElementById("services");
-
-            for(i=0;i<get.length;i++){
-                var divNova = document.createElement("div");    
+            if(qtdVendas > 0){
+                for(i=0;i<qtdVendas;i++)
+                    createElementsVendas(get[i], "div-vendas", "vendas");
                 
-                let utilizado;
-                if(get[i].foiUtilizado == 0)
-                    utilizado = "N";
-                else
-                    utilizado = "S";
+                let getServicosByType = await getServicosRealizadosByType();
+                console.log(getServicosByType);
 
-                divNova.appendChild(document.createTextNode("Código da compra: " + get[i].codCompra + "   "));
-                divNova.appendChild(document.createTextNode("Código do serviço: " + get[i].codServico + "   "));
-                divNova.appendChild(document.createTextNode("Data da compra: " + get[i].dataCompra+ "   "));
-                divNova.appendChild(document.createTextNode("Data de utilização: " + get[i].dataUtilizacao+ "   "));
-                divNova.appendChild(document.createTextNode("Utilizado: " + utilizado));
+                for(i=0;i<getServicosByType.length;i++)
+                    createElementsServicosByType(getServicosByType[i], "tipos", "servicos-tipo");
 
-                form.appendChild(divNova);
+                document.getElementById("qtdVendas").textContent += qtdVendas;
+
+                const countRecompensas = await getCountComprasRecompensas();
+                const countServicosNaoUtilizados = await getCountComprasNaoUtilizadas();
+                
+                document.getElementById("qtdRecompensasGeradas").textContent += countRecompensas;
+                document.getElementById("qtdServicosNaoUtilizados").textContent += countServicosNaoUtilizados;
             }
+
+        }
+
+        function createElementsVendas(venda, nomeDiv, nomeForm){
+            var form = document.getElementById(nomeForm);
+            var divNova = document.createElement(nomeDiv);    
+
+            const formatoData = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            };
+
+            let utilizado;
+            if(venda.foiUtilizado == 0)
+                utilizado = "N";
+            else
+                utilizado = "S";
+
+            const dataCompra = new Date(venda.dataCompra);
+            const dataCompraFormatada = dataCompra.toLocaleString('pt-BR', formatoData);
+            
+            let dataUtilizacaoFormatada; 
+            if(venda.dataUtilizacao != null){
+                const dataUtilizacao = new Date(venda.dataUtilizacao);
+                dataUtilizacaoFormatada = dataUtilizacao.toLocaleString('pt-BR', formatoData);
+            } else
+                dataUtilizacaoFormatada = '-';
+
+            divNova.appendChild(document.createTextNode("Código da compra: " + venda.codCompra + "  |  "));
+            divNova.appendChild(document.createTextNode("Código do serviço: " + venda.codServico + "  |  "));
+            divNova.appendChild(document.createTextNode("Data da compra: " + dataCompraFormatada  + "  |  "));
+            divNova.appendChild(document.createTextNode("Data de utilização: " + dataUtilizacaoFormatada+ "  |  "));
+            divNova.appendChild(document.createTextNode("Utilizado: " + utilizado));
+
+            divNova.appendChild(document.createElement("br"));
+            form.appendChild(divNova);
+        }
+
+        function createElementsServicosByType(servico, nomeDiv, nomeForm){
+            console.log("create");
+            var form = document.getElementById(nomeForm);
+            var divNova = document.createElement(nomeDiv);    
+
+            divNova.appendChild(document.createTextNode("Tipo do serviço: " + servico.tipo + "  |  "));
+            divNova.appendChild(document.createTextNode("Quantidade: " + servico.qtd));
+
+            divNova.appendChild(document.createElement("br"));
+            form.appendChild(divNova);
+        }
+
+        async function getCountComprasRecompensas(){
+            const url = "http://localhost:3000/compras/recompensas/count";
+
+            const response = await fetch(url);
+            const result = await response.json();
+
+            const qtd = result.count;
+            return qtd;
+        }
+
+        async function getCountComprasNaoUtilizadas(){
+            const url = "http://localhost:3000/compras/naoutilizadas/count";
+
+            const response = await fetch(url);
+            const result = await response.json();
+
+            const qtd = result.count;
+            return qtd;
+        }
+        
+        async function getServicosRealizadosByType(){
+            const url = "http://localhost:3000/compras/servicos/tipos";
+
+            const response = await fetch(url);
+            const result = await response.json();
+
+            return result;
         }
     </script>
 </body>

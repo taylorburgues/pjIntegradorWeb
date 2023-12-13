@@ -30,7 +30,6 @@ function Cartoes (bd){
 
     this.criarCartao = async function (cartao){
         const conexao = await this.bd.getConexao();
-        console.log(numCartao);
 
         const sqlInsert = "INSERT INTO Cartoes (NUM_CARTAO, CREATED_DATE)" + 
                         "VALUES (:numCartao, sysdate)";
@@ -198,6 +197,41 @@ function Compras(bd){
 
         ret = await conexao.execute(sqlSelectOne, dados);
 
+        return ret.rows;
+    }
+
+    this.getCountComprasRecompensas = async function(){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectCount = "SELECT count(*) FROM Compras c" +
+                                " JOIN Servicos s on c.cod_servico = s.cod_servico" +
+                                " WHERE s.cod_recompensa IS NOT NULL";
+
+        count = await conexao.execute(sqlSelectCount);
+        console.log(count);
+        return count.rows;
+    }
+
+    this.getCountComprasNaoUtilizadas = async function(){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectCount = "Select count(*) from Compras c WHERE c.foi_utilizado = 0";
+
+        count = await conexao.execute(sqlSelectCount);
+        console.log(count);
+        return count.rows;
+    }
+
+    this.getServicosRealizadosByType = async function(){
+        const conexao = await this.bd.getConexao();
+
+        const sqlSelectByType = "SELECT s.nome, count(*) from Compras c" + 
+        " JOIN Servicos s on c.cod_servico = s.cod_servico" +
+        " WHERE c.foi_utilizado = 1" +
+        " GROUP BY s.nome";
+
+        ret = await conexao.execute(sqlSelectByType);
+        console.log(ret);
         return ret.rows;
     }
 }
@@ -528,6 +562,50 @@ async function compraServico(req, res){
     }   
 }
 
+async function getCountComprasRecompensas(req, res){
+    try{
+        count = await global.compras.getCountComprasRecompensas();
+        return res.status(200).json({"count": count[0][0]});
+    } catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }
+}
+
+async function getCountComprasNaoUtilizadas(req,res){
+    try{
+        count = await global.compras.getCountComprasNaoUtilizadas();
+        return res.status(200).json({"count": count[0][0]});
+    } catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }
+}
+
+function TipoServico(tipo, qtd){
+    this.tipo = tipo;
+    this.qtd = qtd;
+}
+
+async function getServicosRealizadosByType(req,res){
+    let get;
+    try{
+        get = await global.compras.getServicosRealizadosByType();
+    } catch(err){
+        console.error(err);
+        return res.status(409).json();
+    }
+    if(get.length == 0){
+        return res.status(404).json([]);
+    } else {
+        const ret = [];
+        for(i=0;i<get.length;i++)
+            ret.push(new TipoServico(get[i][0], get[i][1]));
+
+        return res.status(200).json(ret);
+    }
+}
+
 async function criarRecompensa(req, res){
     try{
         await global.recompensas.criarRecompensa();
@@ -537,6 +615,7 @@ async function criarRecompensa(req, res){
         return res.status(409).json();
     }
 }
+
 
 function ServicoRecompensa(codServico, nomeServico, descServico, foiObtido, dataRecebimento, dataRealizacao, codRecompensa){
     this.codServico = codServico;
@@ -610,7 +689,7 @@ async function getAllServicosRecompensas(req, res){
     else {
         const ret = [];
         for(i=0;i<get.length;i++){
-            ret.push(new ServicoRecompensa(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5], get[i[6]]));
+            ret.push(new ServicoRecompensa(get[i][0], get[i][1], get[i][2], get[i][3], get[i][4], get[i][5], get[i][6]));
         } 
 
         console.log(ret);
@@ -647,7 +726,10 @@ async function ligarServidor()
     app.post('/compras/:codServico/:numCartao', compraServico);
     app.get('/compras', getAllCompras);
     app.get('/compras/utiliza/:numCartao', getAllComprasNaoUtilizadasDeUmCartao);
+    app.get('/compras/naoutilizadas/count', getCountComprasNaoUtilizadas);
     app.get('/compras/cartoes/:numCartao', getAllComprasByNumCartao);
+    app.get('/compras/recompensas/count', getCountComprasRecompensas);
+    app.get('/compras/servicos/tipos', getServicosRealizadosByType);
     
     app.post('/recompensas', criarRecompensa);
 
