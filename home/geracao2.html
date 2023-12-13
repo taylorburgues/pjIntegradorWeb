@@ -24,7 +24,7 @@
         }
 
         async function createCard(){
-            const body = {numCartao: numCartao, createdDate: Date().toString};
+            const body = {numCartao: numCartao, createdDate: Date().toString}; //terá o número e a data criada no bd;
 
             console.log(body);
             const response = await fetch("http://localhost:3000/cartoes", {
@@ -36,7 +36,7 @@
             });
             
             localStorage.clear();
-            localStorage.setItem("numCartao", numCartao);
+            localStorage.setItem("numCartao", numCartao); //cria um localstorage onde apaga o valor da maquina local e gera um novo quando for clicado no botão;
             
             const result = await response.json();
             console.log(result);

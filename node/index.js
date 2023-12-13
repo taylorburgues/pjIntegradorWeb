@@ -9,7 +9,7 @@ function BD(){
 
         try 
         {
-            global.conexao = oracledb.getConnection({user: 'system', password: 'pioracle', connectString: 'localhost/xe', timezone: 'UTC-3'});
+            global.conexao = oracledb.getConnection({user: 'bd150923150', password: 'Qphci7', connectString: 'BD-ACD/xe', timezone: 'UTC-3'});
         }
         catch (err){
             console.error(err);

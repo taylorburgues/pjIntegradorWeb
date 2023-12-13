@@ -11,6 +11,12 @@ body{
 
 }
 
+.centraliza{
+    margin-top: 200px;
+    margin-left: 800px;
+    font-size: large;
+}
+
 .btnvoltar{
     display: inline-block;
     left: 20px;
